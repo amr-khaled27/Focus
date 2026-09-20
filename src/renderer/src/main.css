@@ -1,0 +1,40 @@
+@import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-text: #080d1c;
+  --color-background: #e7edf9;
+  --color-primary: #1e336b;
+  --color-secondary: #8f7cda;
+  --color-accent: #6a36c4;
+}
+
+@font-face {
+  font-family: "CairoCustom";
+  src: url("./assets/fonts/Vazirmatn-VariableFont_wght.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+body {
+  font-family:
+    "CairoCustom",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  user-select: none;
+}
