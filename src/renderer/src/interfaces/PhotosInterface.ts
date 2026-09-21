@@ -33,7 +33,9 @@ export default interface PhotosState {
     },
   ) => Promise<Result<Photo>>;
   loadDraftPhotos: () => Promise<Result<Photo[]>>;
-  finalizeOrder: () => Promise<
-    Result<{ id: number; itemCount: number; total: number }>
-  >;
+  finalizeOrder: ({
+    customerPaid,
+  }: {
+    customerPaid: number;
+  }) => Promise<Result<{ id: number; itemCount: number; total: number }>>;
 }

@@ -51,6 +51,8 @@ export const orders = sqliteTable("orders", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
+  customerPaid: real("customer_paid").notNull(),
+  total: real("total").notNull(),
 });
 
 export const orderItems = sqliteTable("order_items", {

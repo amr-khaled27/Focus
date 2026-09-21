@@ -1,1 +1,0 @@
-ALTER TABLE `photos` ADD `cost` real NOT NULL;

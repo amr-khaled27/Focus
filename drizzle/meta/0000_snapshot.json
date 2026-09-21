@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5f71f840-bf72-4f07-b7fa-0da7f1d69cfc",
+  "id": "ed1c671f-b819-4840-a89b-9c63f56cb2e8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "order_items": {
@@ -96,6 +96,20 @@
         "user_id": {
           "name": "user_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "customer_paid": {
+          "name": "customer_paid",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "total": {
+          "name": "total",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -219,6 +233,14 @@
           "notNull": true,
           "autoincrement": false
         },
+        "cost": {
+          "name": "cost",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
         "height": {
           "name": "height",
           "type": "integer",
@@ -231,8 +253,7 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "default": 1
+          "autoincrement": false
         },
         "person_name": {
           "name": "person_name",

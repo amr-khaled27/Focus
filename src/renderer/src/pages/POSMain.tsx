@@ -37,6 +37,20 @@ export default function POSMain() {
   const [itemForm, setItemForm] = useState(emptyItem);
   const [status, setStatus] = useState("");
   const [isBusy, setIsBusy] = useState(false);
+  const [customerPaid, setCustomerPaid] = useState("0");
+
+  const handleCustomerPaidChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = event.target.value;
+    if (Number(value) < 0) {
+      setCustomerPaid("0");
+    } else if (Number(value) > totalPrice) {
+      setCustomerPaid(String(totalPrice));
+    } else {
+      setCustomerPaid(value);
+    }
+  };
 
   useEffect(() => {
     void Promise.all([loadTemplates(), loadDraftPhotos()]).then((results) => {
@@ -168,7 +182,7 @@ export default function POSMain() {
 
   const handleFinalize = async () => {
     setIsBusy(true);
-    const result = await finalizeOrder();
+    const result = await finalizeOrder({ customerPaid: Number(customerPaid) });
     setIsBusy(false);
     setStatus(
       result.success ? `تم حفظ الطلب رقم ${result.value.id}.` : result.error,
@@ -344,6 +358,21 @@ export default function POSMain() {
                 );
               })}
             </div>
+          )}
+
+          {totalPrice > 0 && (
+            <label className="block text-sm font-bold mt-4">
+              المبلغ المدفوع من العميل
+              <input
+                required
+                min={0}
+                max={totalPrice}
+                type="number"
+                value={customerPaid}
+                onChange={handleCustomerPaidChange}
+                className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none mt-2 h-12 w-full rounded-xl border duration-100 border-slate-200 px-4 outline-none focus:border-primary focus:ring-1 hover:border-slate-200/50 focus:ring-secondary/40"
+              />
+            </label>
           )}
 
           <div className="mt-6 flex flex-col items-end gap-4 border-t border-white/15 pt-6 sm:flex-row sm:items-center sm:justify-between">

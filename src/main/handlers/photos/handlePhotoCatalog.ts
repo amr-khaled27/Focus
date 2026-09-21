@@ -7,7 +7,7 @@ import {
   getPhotoTemplates,
   getPhotosWithNoOrder,
   insertDraftPhoto,
-} from "@main/db";
+} from "@main/db/index";
 import { ipcMain } from "electron";
 
 export default function handlePhotoCatalog(

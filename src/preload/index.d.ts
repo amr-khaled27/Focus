@@ -76,7 +76,7 @@ declare global {
       deleteDraftPhoto: (
         photoId: number,
       ) => Promise<{ success: true } | { success: false; error: string }>;
-      finalizeOrder: () => Promise<
+      finalizeOrder: ({ customerPaid }: { customerPaid: number }) => Promise<
         | {
             success: true;
             order: { id: number; itemCount: number; total: number };

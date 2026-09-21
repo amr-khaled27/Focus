@@ -232,7 +232,9 @@ export async function deleteDraftPhoto(photoId: number): Promise<boolean> {
   return result.rowsAffected > 0;
 }
 
-export async function finalizeDraftOrder(): Promise<{
+export async function finalizeDraftOrder(payload: {
+  customerPaid: number;
+}): Promise<{
   id: number;
   itemCount: number;
   total: number;
@@ -256,6 +258,11 @@ export async function finalizeDraftOrder(): Promise<{
       .values({
         createdAt: new Date().toISOString(),
         userId: session[0].userId,
+        customerPaid: payload.customerPaid,
+        total: draftPhotos.reduce(
+          (sum, photo) => sum + photo.price * photo.qty,
+          0,
+        ),
       })
       .returning();
     const order = orderResult[0];

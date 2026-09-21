@@ -5,12 +5,12 @@ import { ipcMain } from "electron";
 export default function handleFinalizeOrder(
   mainWindow: Electron.BrowserWindow | null,
 ) {
-  ipcMain.handle("finalizeOrder", async (event) => {
+  ipcMain.handle("finalizeOrder", async (event, payload) => {
     if (!isTrustedSender(event, mainWindow)) {
       return { success: false, error: "طلب غير موثوق" };
     }
     try {
-      return { success: true, order: await finalizeDraftOrder() };
+      return { success: true, order: await finalizeDraftOrder(payload) };
     } catch (error) {
       return {
         success: false,

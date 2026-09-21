@@ -12,6 +12,8 @@ CREATE TABLE `orders` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`created_at` text NOT NULL,
 	`user_id` integer NOT NULL,
+	`customer_paid` real NOT NULL,
+	`total` real NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
@@ -31,8 +33,9 @@ CREATE TABLE `photos` (
 	`template_id` integer NOT NULL,
 	`price` real NOT NULL,
 	`width` integer NOT NULL,
+	`cost` real DEFAULT 0 NOT NULL,
 	`height` integer NOT NULL,
-	`qty` integer DEFAULT 1 NOT NULL,
+	`qty` integer NOT NULL,
 	`person_name` text,
 	`photo_name` text,
 	`order_id` integer,

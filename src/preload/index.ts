@@ -21,7 +21,7 @@ const api = {
   getDraftPhotos: () => ipcRenderer.invoke("getDraftPhotos"),
   deleteDraftPhoto: (photoId) =>
     ipcRenderer.invoke("deleteDraftPhoto", photoId),
-  finalizeOrder: () => ipcRenderer.invoke("finalizeOrder"),
+  finalizeOrder: (payload) => ipcRenderer.invoke("finalizeOrder", payload),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -64,8 +64,8 @@ const usePhotosStore = create<PhotosState>((set) => ({
     return { success: true, value: response.photos };
   },
 
-  finalizeOrder: async () => {
-    const response = await window.api.finalizeOrder();
+  finalizeOrder: async ({ customerPaid }) => {
+    const response = await window.api.finalizeOrder({ customerPaid });
     if (!response.success) return response;
     set({ draftPhotos: [] });
     return { success: true, value: response.order };
