@@ -1,7 +1,5 @@
 allowBuilds:
+  bcrypt: false
   electron: true
   electron-winstaller: false
   esbuild: false
-onlyBuiltDependencies:
-  - electron
-  - esbuild

@@ -1,11 +1,16 @@
 import { ipcMain } from "electron";
 import { authenticateUser, createSession } from "@main/db";
 import { randomBytes } from "crypto";
+import isTrustedSender from "@main/utils/isTrustedSender";
 
-export function handleLogin() {
+export function handleLogin(mainWindow: Electron.BrowserWindow | null) {
   ipcMain.handle(
     "login",
-    async (_, payload: { userId: number; pin: string }) => {
+    async (event, payload: { userId: number; pin: string }) => {
+      if (!isTrustedSender(event, mainWindow)) {
+        return { success: false, error: "طلب غير موثوق" };
+      }
+
       try {
         const user = await authenticateUser(payload.userId, payload.pin);
 

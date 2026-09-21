@@ -39,7 +39,7 @@ export default function AdminSignUp() {
       if (res.success) {
         setIsAdminInitialized(true);
         setUser(res.user);
-        navigate("/test", { replace: true });
+        navigate("/pos", { replace: true });
         return;
       }
 

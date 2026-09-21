@@ -9,6 +9,19 @@ const api = {
   isUserAuthenticated: () => ipcRenderer.invoke("isUserAuthenticated"),
   login: (payload) => ipcRenderer.invoke("login", payload),
   logout: () => ipcRenderer.invoke("logout"),
+  getPhotoTemplates: () => ipcRenderer.invoke("getPhotoTemplates"),
+  createPhotoTemplate: (payload) =>
+    ipcRenderer.invoke("createPhotoTemplate", payload),
+  editTemplate: (templateId, payload) =>
+    ipcRenderer.invoke("editTemplate", templateId, payload),
+  insertDraftPhoto: (payload) =>
+    ipcRenderer.invoke("insertDraftPhoto", payload),
+  editDraftPhoto: (photoId, payload) =>
+    ipcRenderer.invoke("editDraftPhoto", photoId, payload),
+  getDraftPhotos: () => ipcRenderer.invoke("getDraftPhotos"),
+  deleteDraftPhoto: (photoId) =>
+    ipcRenderer.invoke("deleteDraftPhoto", photoId),
+  finalizeOrder: () => ipcRenderer.invoke("finalizeOrder"),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

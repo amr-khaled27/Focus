@@ -4,12 +4,14 @@ import { pathToFileURL } from "url";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "@resources/icon.png?asset";
 import { initializeDatabase } from "@main/db";
-import { handleIsAdminInitialized } from "./handlers/handleIsAdminInitialized";
-import { handleInitAdmin } from "./handlers/handleInitAdmin";
-import { handleIsUserAuthenticated } from "./handlers/handleIsUserAuthenticated";
-import { handleLogout } from "./handlers/handleLogout";
-import { handleLogin } from "./handlers/handleLogin";
-import handleGetUsers from "./handlers/handleGetUsers";
+import { handleIsAdminInitialized } from "./handlers/auth/handleIsAdminInitialized";
+import { handleInitAdmin } from "./handlers/auth/handleInitAdmin";
+import { handleIsUserAuthenticated } from "./handlers/auth/handleIsUserAuthenticated";
+import { handleLogout } from "./handlers/auth/handleLogout";
+import { handleLogin } from "./handlers/auth/handleLogin";
+import handleGetUsers from "./handlers/auth/handleGetUsers";
+import handlePhotoCatalog from "./handlers/photos/handlePhotoCatalog";
+import handleFinalizeOrder from "./handlers/photos/handleFinalizeOrder";
 import { store } from "./store";
 
 let splashWindow: BrowserWindow | null = null;
@@ -52,7 +54,7 @@ function destroySplashWindow() {
   splashWindow = null;
 }
 
-function createWindow() {
+function createWindow(): BrowserWindow {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1280,
@@ -85,6 +87,8 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
   }
+
+  return mainWindow;
 }
 
 // This method will be called when Electron has finished
@@ -104,14 +108,16 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window);
   });
 
-  handleIsAdminInitialized();
-  handleInitAdmin();
-  handleIsUserAuthenticated();
-  handleLogout();
-  handleLogin();
-  handleGetUsers();
+  const mainWindow = createWindow();
 
-  createWindow();
+  handleIsAdminInitialized(mainWindow);
+  handleInitAdmin(mainWindow);
+  handleIsUserAuthenticated(mainWindow);
+  handleLogout(mainWindow);
+  handleLogin(mainWindow);
+  handleGetUsers(mainWindow);
+  handlePhotoCatalog(mainWindow);
+  handleFinalizeOrder(mainWindow);
 
   app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the

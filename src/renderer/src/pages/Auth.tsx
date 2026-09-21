@@ -12,7 +12,7 @@ export default function SetupAdmin() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/test" replace />;
+    return <Navigate to="/pos" replace />;
   }
 
   if (!isAdminInitialized) {

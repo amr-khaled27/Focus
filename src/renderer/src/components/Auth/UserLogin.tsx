@@ -61,7 +61,7 @@ export default function UserLogin() {
     }
 
     useSettingsStore.getState().setUser(result.user);
-    navigate("/test", { replace: true });
+    navigate("/pos", { replace: true });
   };
 
   return (

@@ -20,6 +20,9 @@ importers:
       '@libsql/client':
         specifier: ^0.18.0
         version: 0.18.0
+      bcrypt:
+        specifier: ^6.0.0
+        version: 6.0.0
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@libsql/client@0.18.0)
@@ -54,6 +57,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.3(vite@7.3.6(@types/node@22.20.2)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.23.13))
+      '@types/bcrypt':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@types/node':
         specifier: ^22.19.1
         version: 22.20.2
@@ -1246,6 +1252,9 @@ packages:
   '@types/babel__traverse@7.28.0':
     resolution: {integrity: sha512-8PvcXf70gTDZBgt9ptxJ8elBeBjcLOAcOtoO/mPJjtji1+CdGbHgm77om1GrsPxsiE+uXIpNSK64UYaIwQXd4Q==}
 
+  '@types/bcrypt@6.0.0':
+    resolution: {integrity: sha512-/oJGukuH3D2+D+3H4JWLaAsJ/ji86dhRidzZ/Od7H/i8g+aCmvkeCc6Ni/f9uxGLSQVCRZkX2/lqEFG2BvWtlQ==}
+
   '@types/cacheable-request@6.0.3':
     resolution: {integrity: sha512-IQ3EbTzGxIigb1I3qPZc1rWJnH0BmSKv5QYTalEwweFvyBDLSAe24zP0le/hyi7ecGfZVlIVAg4BZqb8WBwKqw==}
 
@@ -1494,6 +1503,10 @@ packages:
     resolution: {integrity: sha512-le521dGVfxM7yRX0EikCoSz+rOK+hHzdDt/E7mG1jOJB/6WAAUuwVroLwaB7ApaUsz5Q0kFlDXLSA9MheUIfRQ==}
     engines: {node: '>=6.0.0'}
     hasBin: true
+
+  bcrypt@6.0.0:
+    resolution: {integrity: sha512-cU8v/EGSrnH+HnxV2z0J7/blxH8gq7Xh2JFT6Aroax7UohdmiJJlxApMxtKfuI7z68NvvVcmR78k2LbT6efhRg==}
+    engines: {node: '>= 18'}
 
   bluebird@3.7.2:
     resolution: {integrity: sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==}
@@ -2695,12 +2708,20 @@ packages:
     resolution: {integrity: sha512-ymk4aIzxdPopw2giv8Fs1Ec6vybGkjmyxUwVqhkI4MCy2tVfXdkOGGWieWVjL0THgH+7a8lRdevyupoYj3Js/Q==}
     engines: {node: '>=22.12.0'}
 
+  node-addon-api@8.9.2:
+    resolution: {integrity: sha512-VijLXbi3UACN69I0JVXJsX4tjACjNoQDgv2gTF6sx2wWEi8tkSg2eX8p5gSIFi8z2+DL3oHmY6OyKce38SDolg==}
+    engines: {node: ^18 || ^20 || >= 21}
+
   node-api-version@0.2.1:
     resolution: {integrity: sha512-2xP/IGGMmmSQpI1+O/k72jF/ykvZ89JeuKX3TLJAYPDVLUalrshrLHkeVcCCZqG/eEa635cr8IBYzgnDvM2O8Q==}
 
   node-exports-info@1.6.2:
     resolution: {integrity: sha512-kXs9Go0cah0qHVV2v389IXQLdLCeE1xfFtjOAF+iobu0OIoG1pje8At2vMHyaPMiPMnG/LWP50twML21eMcAag==}
     engines: {node: '>= 0.4'}
+
+  node-gyp-build@4.8.4:
+    resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
+    hasBin: true
 
   node-gyp@12.4.0:
     resolution: {integrity: sha512-OMcPNvqTCFUnNaBlmdgq+lfNqY7gTiSmNRDjY3uAXRyudeKZEZxu3CLtjMQrx4zZxCX2b/mpNqTtwuCJgXhHkw==}
@@ -4298,6 +4319,10 @@ snapshots:
     dependencies:
       '@babel/types': 7.29.8
 
+  '@types/bcrypt@6.0.0':
+    dependencies:
+      '@types/node': 22.20.2
+
   '@types/cacheable-request@6.0.3':
     dependencies:
       '@types/http-cache-semantics': 4.2.0
@@ -4638,6 +4663,11 @@ snapshots:
   base64-js@1.5.1: {}
 
   baseline-browser-mapping@2.11.23: {}
+
+  bcrypt@6.0.0:
+    dependencies:
+      node-addon-api: 8.9.2
+      node-gyp-build: 4.8.4
 
   bluebird@3.7.2: {}
 
@@ -5997,6 +6027,8 @@ snapshots:
     dependencies:
       semver: 7.7.4
 
+  node-addon-api@8.9.2: {}
+
   node-api-version@0.2.1:
     dependencies:
       semver: 7.7.4
@@ -6007,6 +6039,8 @@ snapshots:
       es-errors: 1.3.0
       object.entries: 1.1.9
       semver: 6.3.1
+
+  node-gyp-build@4.8.4: {}
 
   node-gyp@12.4.0:
     dependencies:

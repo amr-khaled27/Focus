@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1789638331344,
-      "tag": "0000_woozy_malcolm_colcord",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1789651238207,
-      "tag": "0001_lively_carnage",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1789757626580,
-      "tag": "0002_aspiring_franklin_storm",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1789914517379,
-      "tag": "0003_violet_reaper",
+      "when": 1789999076465,
+      "tag": "0000_wise_tigra",
       "breakpoints": true
     }
   ]

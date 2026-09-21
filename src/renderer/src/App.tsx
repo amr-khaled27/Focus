@@ -4,7 +4,7 @@ import { PageLoader } from "@renderer/components/PageLoader";
 import { AdminGuard } from "@renderer/components/AdminGuard";
 
 const Auth = lazy(() => import("./pages/Auth"));
-const MainPage = lazy(() => import("./pages/MainPage"));
+const POSMain = lazy(() => import("./pages/POSMain"));
 
 function App() {
   return (
@@ -14,7 +14,7 @@ function App() {
           <Route path="/" element={<Auth />} />
 
           <Route element={<AdminGuard />}>
-            <Route path="/test" element={<MainPage />} />
+            <Route path="/pos" element={<POSMain />} />
           </Route>
         </Routes>
       </Suspense>

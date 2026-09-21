@@ -1,8 +1,13 @@
 import { getLoginUsers } from "@main/db";
-import { ipcMain } from "electron/main";
+import { BrowserWindow, ipcMain } from "electron/main";
+import isTrustedSender from "@main/utils/isTrustedSender";
 
-export default function handleGetUsers() {
-  ipcMain.handle("getUsers", () => {
+export default function handleGetUsers(mainWindow: BrowserWindow | null) {
+  ipcMain.handle("getUsers", (event) => {
+    if (!isTrustedSender(event, mainWindow)) {
+      return { success: false, error: "طلب غير موثوق" };
+    }
+
     try {
       return getLoginUsers();
     } catch (error) {

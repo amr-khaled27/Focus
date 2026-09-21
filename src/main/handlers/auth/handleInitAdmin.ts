@@ -1,19 +1,26 @@
 import { ipcMain } from "electron";
 import { getAdminInitialized, addUser, createSession } from "@main/db";
 import { randomBytes } from "crypto";
+import isTrustedSender from "@main/utils/isTrustedSender";
+import { hashPIN } from "@main/utils/PINHashing";
 
-export function handleInitAdmin() {
+export function handleInitAdmin(mainWindow: Electron.BrowserWindow | null) {
   ipcMain.handle("initAdmin", async (_, payload) => {
+    if (!isTrustedSender(_, mainWindow)) {
+      return { success: false, error: "طلب غير موثوق" };
+    }
     try {
       const adminInitialized = await getAdminInitialized();
       if (adminInitialized) {
         return { success: false, error: "Admin is already initialized" };
       }
 
+      const hashedPIN = await hashPIN(payload.pin);
+
       const adminUser = await addUser({
         name: payload.name,
         email: payload.email,
-        pin: payload.pin,
+        pin: hashedPIN,
         role: "admin",
         createdAt: new Date().toISOString(),
       });

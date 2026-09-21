@@ -1,0 +1,113 @@
+import { create } from "zustand";
+import { Photo } from "@shared/types/Photo";
+import { PhotoTemplate } from "@shared/types/PhotoTemplate";
+
+type Result<T> =
+  | { success: true; value: T }
+  | { success: false; error: string };
+
+interface PhotosState {
+  templates: PhotoTemplate[];
+  draftPhotos: Photo[];
+  loadTemplates: () => Promise<Result<PhotoTemplate[]>>;
+  createTemplate: (
+    template: Omit<PhotoTemplate, "id">,
+  ) => Promise<Result<PhotoTemplate>>;
+  editTemplate: (
+    templateId: number,
+    template: Omit<PhotoTemplate, "id">,
+  ) => Promise<Result<PhotoTemplate>>;
+  addDraftPhoto: (input: {
+    templateId: number;
+    personName?: string;
+    photoName?: string;
+    qty: number;
+  }) => Promise<Result<Photo>>;
+  deleteDraftPhoto: (photoId: number) => Promise<Result<void>>;
+  editDraftPhoto: (
+    photoId: number,
+    input: {
+      templateId: number;
+      personName?: string;
+      photoName?: string;
+      qty: number;
+    },
+  ) => Promise<Result<Photo>>;
+  loadDraftPhotos: () => Promise<Result<Photo[]>>;
+  finalizeOrder: () => Promise<
+    Result<{ id: number; itemCount: number; total: number }>
+  >;
+}
+
+const usePhotosStore = create<PhotosState>((set) => ({
+  templates: [],
+  draftPhotos: [],
+
+  loadTemplates: async () => {
+    const response = await window.api.getPhotoTemplates();
+    if (!response.success) return response;
+    set({ templates: response.templates });
+    return { success: true, value: response.templates };
+  },
+
+  createTemplate: async (template) => {
+    const response = await window.api.createPhotoTemplate(template);
+    if (!response.success) return response;
+    set((state) => ({ templates: [...state.templates, response.template] }));
+    return { success: true, value: response.template };
+  },
+
+  editTemplate: async (templateId, template) => {
+    const response = await window.api.editTemplate(templateId, template);
+    if (!response.success) return response;
+    set((state) => ({
+      templates: state.templates.map((item) =>
+        item.id === templateId ? response.template : item,
+      ),
+    }));
+    return { success: true, value: response.template };
+  },
+
+  addDraftPhoto: async (input) => {
+    const response = await window.api.insertDraftPhoto(input);
+    if (!response.success) return response;
+    set((state) => ({ draftPhotos: [...state.draftPhotos, response.photo] }));
+    return { success: true, value: response.photo };
+  },
+
+  deleteDraftPhoto: async (photoId) => {
+    const response = await window.api.deleteDraftPhoto(photoId);
+    if (!response.success) return response;
+    set((state) => ({
+      draftPhotos: state.draftPhotos.filter((photo) => photo.id !== photoId),
+    }));
+    return { success: true, value: undefined };
+  },
+
+  editDraftPhoto: async (photoId, input) => {
+    const response = await window.api.editDraftPhoto(photoId, input);
+    if (!response.success) return response;
+    set((state) => ({
+      draftPhotos: state.draftPhotos.map((photo) =>
+        photo.id === photoId ? response.photo : photo,
+      ),
+    }));
+    return { success: true, value: response.photo };
+  },
+
+  loadDraftPhotos: async () => {
+    const response = await window.api.getDraftPhotos();
+    if (!response.success) return response;
+    set({ draftPhotos: response.photos });
+    return { success: true, value: response.photos };
+  },
+
+  finalizeOrder: async () => {
+    const response = await window.api.finalizeOrder();
+    if (!response.success) return response;
+    set({ draftPhotos: [] });
+    return { success: true, value: response.order };
+  },
+}));
+
+export default usePhotosStore;
