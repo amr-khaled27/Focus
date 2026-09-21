@@ -5,4 +5,5 @@ export type PhotoTemplate = {
   height: number;
   unit: string;
   price: number;
+  cost: number;
 };

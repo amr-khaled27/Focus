@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5f71f840-bf72-4f07-b7fa-0da7f1d69cfc",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "5175daf5-0b74-4e45-b3ba-e9a87e7a3e65",
+  "prevId": "5f71f840-bf72-4f07-b7fa-0da7f1d69cfc",
   "tables": {
     "order_items": {
       "name": "order_items",
@@ -215,6 +215,13 @@
         "width": {
           "name": "width",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cost": {
+          "name": "cost",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false

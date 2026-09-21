@@ -21,7 +21,8 @@ CREATE TABLE `photo_templates` (
 	`width` integer NOT NULL,
 	`height` integer NOT NULL,
 	`unit` text DEFAULT 'cm' NOT NULL,
-	`price` real NOT NULL
+	`price` real NOT NULL,
+	`cost` real NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `photos` (

@@ -24,6 +24,7 @@ export const photoTemplates = sqliteTable("photo_templates", {
   height: integer("height").notNull(),
   unit: text("unit").default("cm").notNull(),
   price: real("price").notNull(),
+  cost: real("cost").notNull(),
 });
 
 export const photos = sqliteTable("photos", {
@@ -34,8 +35,9 @@ export const photos = sqliteTable("photos", {
     .references(() => photoTemplates.id, { onDelete: "restrict" }),
   price: real("price").notNull(),
   width: integer("width").notNull(),
+  cost: real("cost").default(0).notNull(),
   height: integer("height").notNull(),
-  qty: integer("qty").default(1).notNull(),
+  qty: integer("qty").notNull(),
   personName: text("person_name"),
   photoName: text("photo_name"),
   orderId: integer("order_id").references(() => orders.id, {

@@ -173,6 +173,7 @@ export async function insertDraftPhoto(input: {
       price: template[0].price,
       width: template[0].width,
       height: template[0].height,
+      cost: template[0].cost,
       qty: input.qty,
       personName: input.personName || null,
       photoName: input.photoName || null,
@@ -217,24 +218,6 @@ export async function editDraftPhoto(
     throw new Error("Draft photo not found");
   }
   return result[0];
-}
-
-export async function insertPhoto(
-  photo: Omit<Photo, "id" | "createdAt" | "orderId">,
-): Promise<Photo> {
-  const result = await getDatabase()
-    .insert(photos)
-    .values({ ...photo, createdAt: new Date().toISOString(), orderId: null })
-    .returning();
-  return result[0];
-}
-
-export async function deletePhoto(photoId: number): Promise<boolean> {
-  const result = await getDatabase()
-    .delete(photos)
-    .where(eq(photos.id, photoId))
-    .execute();
-  return result.rowsAffected > 0;
 }
 
 export async function getPhotosWithNoOrder(): Promise<Photo[]> {

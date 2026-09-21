@@ -4,7 +4,7 @@ import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const emptyTemplate = { name: "", width: "", height: "", price: "" };
+const emptyTemplate = { name: "", width: "", height: "", price: "", cost: "" };
 const emptyItem = { personName: "", photoName: "", qty: "1" };
 const money = (value: number) => `${value.toFixed(2)} ج.م`;
 
@@ -12,7 +12,6 @@ type Modal = "item" | "template" | null;
 
 export default function POSMain() {
   const { user, clearUser } = useSettingsStore();
-  console.log(user);
   const {
     templates,
     draftPhotos,
@@ -89,6 +88,7 @@ export default function POSMain() {
       width: String(template.width),
       height: String(template.height),
       price: String(template.price),
+      cost: String(template.cost),
     });
     setModal("template");
   };
@@ -114,6 +114,7 @@ export default function POSMain() {
       height: Number(templateForm.height),
       unit: "cm",
       price: Number(templateForm.price),
+      cost: Number(templateForm.cost),
     };
     const result =
       editingTemplateId === null
@@ -458,7 +459,7 @@ export default function POSMain() {
                   </label>
                 </div>
                 <label className="block text-sm font-bold">
-                  السعر
+                  السعر للعميل
                   <input
                     required
                     min="0"
@@ -469,6 +470,23 @@ export default function POSMain() {
                       setTemplateForm({
                         ...templateForm,
                         price: event.target.value,
+                      })
+                    }
+                    className="mt-2 h-12 w-full rounded-xl border border-slate-200 px-4 outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"
+                  />
+                </label>
+                <label className="block text-sm font-bold">
+                  التكلفة
+                  <input
+                    required
+                    min="0"
+                    step="0.01"
+                    type="number"
+                    value={templateForm.cost}
+                    onChange={(event) =>
+                      setTemplateForm({
+                        ...templateForm,
+                        cost: event.target.value,
                       })
                     }
                     className="mt-2 h-12 w-full rounded-xl border border-slate-200 px-4 outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"
