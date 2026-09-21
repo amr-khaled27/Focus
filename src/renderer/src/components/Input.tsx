@@ -6,27 +6,27 @@ import type {
 } from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
-type AuthInputRootProps = {
+type InputRootProps = {
   children: ReactNode;
 };
 
-function AuthInputRoot({ children }: AuthInputRootProps) {
+function InputRoot({ children }: InputRootProps) {
   return <div>{children}</div>;
 }
 
-function AuthInputLabel({
+function InputLabel({
   className = "",
   ...props
 }: LabelHTMLAttributes<HTMLLabelElement>) {
   return (
     <label
       {...props}
-      className={`mb-3 block text-base font-semibold text-text ${className}`}
+      className={`mb-3 block text-base font-semibold ${className}`}
     />
   );
 }
 
-type AuthInputControlProps = Omit<
+type InputControlProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
   "className" | "onChange"
 > & {
@@ -37,14 +37,14 @@ type AuthInputControlProps = Omit<
   registration?: UseFormRegisterReturn;
 };
 
-function AuthInputControl({
+function InputControl({
   children,
   className = "",
   numericOnly = false,
   onChange,
   registration,
   ...inputProps
-}: AuthInputControlProps) {
+}: InputControlProps) {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (numericOnly) {
       event.target.value = event.target.value.replace(/\D/g, "");
@@ -67,18 +67,18 @@ function AuthInputControl({
   );
 }
 
-function AuthInputAdornment({ children }: { children: ReactNode }) {
+function InputAdornment({ children }: { children: ReactNode }) {
   return children;
 }
 
-function AuthInputError({ error }: { error?: string }) {
+function InputError({ error }: { error?: string }) {
   return error ? <p className="mt-2 text-sm text-red-600">{error}</p> : null;
 }
 
-export const AuthInput = Object.assign(AuthInputRoot, {
-  Root: AuthInputRoot,
-  Label: AuthInputLabel,
-  Control: AuthInputControl,
-  Adornment: AuthInputAdornment,
-  Error: AuthInputError,
+export const Input = Object.assign(InputRoot, {
+  Root: InputRoot,
+  Label: InputLabel,
+  Control: InputControl,
+  Adornment: InputAdornment,
+  Error: InputError,
 });

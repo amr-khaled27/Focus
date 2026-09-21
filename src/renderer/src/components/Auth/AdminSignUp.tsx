@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AuthInput } from "./AuthInput";
+import { Input } from "@renderer/components/Input";
 import { PasswordVisibilityToggle } from "./PasswordVisibilityToggle";
 import useSettingsStore from "@renderer/store/settings";
 
@@ -93,23 +93,21 @@ export default function AdminSignUp() {
               onSubmit={handleSubmit(handleValidSubmit)}
               noValidate
             >
-              <AuthInput.Root>
-                <AuthInput.Label htmlFor="name">الاسم الكامل</AuthInput.Label>
-                <AuthInput.Control
+              <Input.Root>
+                <Input.Label htmlFor="name">الاسم الكامل</Input.Label>
+                <Input.Control
                   id="name"
                   type="text"
                   autoComplete="name"
                   placeholder="مثال: أحمد محمد"
                   registration={register("name")}
                 />
-                <AuthInput.Error error={errors.name?.message} />
-              </AuthInput.Root>
+                <Input.Error error={errors.name?.message} />
+              </Input.Root>
 
-              <AuthInput.Root>
-                <AuthInput.Label htmlFor="email">
-                  البريد الإلكتروني
-                </AuthInput.Label>
-                <AuthInput.Control
+              <Input.Root>
+                <Input.Label htmlFor="email">البريد الإلكتروني</Input.Label>
+                <Input.Control
                   id="email"
                   type="email"
                   autoComplete="email"
@@ -117,12 +115,12 @@ export default function AdminSignUp() {
                   dir="ltr"
                   registration={register("email")}
                 />
-                <AuthInput.Error error={errors.email?.message} />
-              </AuthInput.Root>
+                <Input.Error error={errors.email?.message} />
+              </Input.Root>
 
-              <AuthInput.Root>
-                <AuthInput.Label htmlFor="pin">الرقم السري</AuthInput.Label>
-                <AuthInput.Control
+              <Input.Root>
+                <Input.Label htmlFor="pin">الرقم السري</Input.Label>
+                <Input.Control
                   id="pin"
                   type={isPinVisible ? "text" : "password"}
                   inputMode="numeric"
@@ -135,15 +133,15 @@ export default function AdminSignUp() {
                   numericOnly
                   registration={register("pin")}
                 >
-                  <AuthInput.Adornment>
+                  <Input.Adornment>
                     <PasswordVisibilityToggle
                       isVisible={isPinVisible}
                       onToggle={() => setIsPinVisible((visible) => !visible)}
                     />
-                  </AuthInput.Adornment>
-                </AuthInput.Control>
-                <AuthInput.Error error={errors.pin?.message} />
-              </AuthInput.Root>
+                  </Input.Adornment>
+                </Input.Control>
+                <Input.Error error={errors.pin?.message} />
+              </Input.Root>
 
               <button
                 type="submit"

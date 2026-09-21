@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import useSettingsStore from "@renderer/store/settings";
 import { User } from "@shared/types/User";
-import { AuthInput } from "./AuthInput";
+import { Input } from "@renderer/components/Input";
 import { PasswordVisibilityToggle } from "./PasswordVisibilityToggle";
 
 type LoginUser = Omit<User, "pin">;
@@ -154,11 +154,11 @@ export default function UserLogin() {
                 className="mt-8 space-y-5"
                 onSubmit={handleSubmit(handleLogin)}
               >
-                <AuthInput.Root>
-                  <AuthInput.Label htmlFor="pin">
+                <Input.Root>
+                  <Input.Label htmlFor="pin">
                     الرقم السري لـ {selectedUser.name}
-                  </AuthInput.Label>
-                  <AuthInput.Control
+                  </Input.Label>
+                  <Input.Control
                     id="pin"
                     type={isPinVisible ? "text" : "password"}
                     inputMode="numeric"
@@ -176,15 +176,15 @@ export default function UserLogin() {
                     dir="ltr"
                     className="pl-12 text-left text-lg tracking-[0.35em]"
                   >
-                    <AuthInput.Adornment>
+                    <Input.Adornment>
                       <PasswordVisibilityToggle
                         isVisible={isPinVisible}
                         onToggle={() => setIsPinVisible((visible) => !visible)}
                       />
-                    </AuthInput.Adornment>
-                  </AuthInput.Control>
-                  <AuthInput.Error error={formErrors.pin?.message} />
-                </AuthInput.Root>
+                    </Input.Adornment>
+                  </Input.Control>
+                  <Input.Error error={formErrors.pin?.message} />
+                </Input.Root>
 
                 <button
                   type="submit"
