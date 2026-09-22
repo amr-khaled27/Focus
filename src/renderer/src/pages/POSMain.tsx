@@ -4,7 +4,7 @@ import { TemplateGrid } from "@renderer/components/POS/TemplateGrid";
 import { Input } from "@renderer/components/Input";
 import usePhotosStore from "@renderer/store/photos";
 import useSettingsStore from "@renderer/store/settings";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
@@ -30,11 +30,6 @@ type TemplateModalState = {
 };
 
 export default function POSMain() {
-  const renderRef = useRef(0);
-  useEffect(() => {
-    renderRef.current += 1;
-    console.log(`POSMain rendered ${renderRef.current} times`);
-  });
   const user = useSettingsStore((state) => state.user);
   const clearUser = useSettingsStore((state) => state.clearUser);
   const loadTemplates = usePhotosStore((state) => state.loadTemplates);
@@ -151,9 +146,9 @@ export default function POSMain() {
   }
 
   return (
-    <main className="min-h-screen bg-background text-text" dir="rtl">
+    <main className="flex h-screen w-full flex-col overflow-hidden bg-background text-text">
       <header className="border-b border-slate-200 bg-white px-6 py-4 sm:px-10">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+        <div className="flex w-full items-center justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-accent">نقطة البيع</p>
             <h1 className="text-2xl font-bold">اختر المنتج</h1>
@@ -168,7 +163,7 @@ export default function POSMain() {
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-7xl gap-6 p-6 md:grid-cols-12 md:items-start lg:gap-8 lg:p-10">
+      <div className="grid min-h-0 flex-1 w-full gap-4 overflow-y-auto p-2 md:grid-cols-12 md:items-start lg:gap-8 lg:p-4">
         <TemplateGrid
           selectedTemplateId={itemTemplateId}
           onSelect={openItemModal}

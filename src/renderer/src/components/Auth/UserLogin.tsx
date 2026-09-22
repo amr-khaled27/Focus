@@ -15,17 +15,17 @@ type UserLoginValues = {
 export default function UserLogin() {
   console.log("login page rendered");
 
-  const [users, setUsers] = useState<LoginUser[]>([]);
+  const [users, setUsers] = useState<LoginUser[] | null>(null);
   const [selectedUser, setSelectedUser] = useState<LoginUser | null>(null);
   const [isPinVisible, setIsPinVisible] = useState(false);
-  const [error, setError] = useState("");
-  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors: formErrors },
+    setError: setFormError,
+    clearErrors,
+    formState: { errors: formErrors, isSubmitting },
   } = useForm<UserLoginValues>();
 
   const handelUserSelection = (user: LoginUser) => {
@@ -36,27 +36,29 @@ export default function UserLogin() {
     }
     setSelectedUser(user);
     reset();
-    setError("");
+    clearErrors();
   };
 
   useEffect(() => {
     window.api
       .getUsers()
       .then(setUsers)
-      .catch(() => setError("Unable to load accounts"))
-      .finally(() => setIsLoadingUsers(false));
-  }, []);
+      .catch(() => {
+        setUsers([]);
+        setFormError("root", { message: "Unable to load accounts" });
+      });
+  }, [setFormError]);
 
   const handleLogin = async ({ pin }: UserLoginValues) => {
     if (!selectedUser) {
       return;
     }
 
-    setError("");
+    clearErrors("root");
     const result = await window.api.login({ userId: selectedUser.id, pin });
 
     if (!result.success) {
-      setError(result.error);
+      setFormError("root", { message: result.error });
       return;
     }
 
@@ -103,7 +105,7 @@ export default function UserLogin() {
               </p>
             </div>
 
-            {isLoadingUsers ? (
+            {users === null ? (
               <p className="text-sm text-slate-500">جاري تحميل الحسابات...</p>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
@@ -188,14 +190,20 @@ export default function UserLogin() {
 
                 <button
                   type="submit"
-                  className="h-14 w-full rounded-xl bg-primary px-5 text-base font-bold text-white transition hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary/20 active:translate-y-px"
+                  disabled={isSubmitting}
+                  aria-busy={isSubmitting}
+                  className="mt-4 h-14 w-full rounded-xl bg-primary px-5 text-base font-bold text-white transition hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary/20 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  تسجيل الدخول
+                  {isSubmitting ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
                 </button>
               </form>
             )}
 
-            {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+            {formErrors.root?.message && (
+              <p className="mt-4 text-sm text-red-600">
+                {formErrors.root.message}
+              </p>
+            )}
           </div>
         </section>
       </div>

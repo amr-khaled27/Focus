@@ -19,7 +19,7 @@ export const TemplateGrid = memo(function TemplateGrid({
   const templates = usePhotosStore((state) => state.templates);
 
   return (
-    <section className="min-w-0 md:col-span-8">
+    <section className="min-w-0 md:col-span-7">
       <div className="mb-5 flex items-end justify-between gap-4">
         <div>
           <p className="mb-2 text-sm font-semibold text-accent">القوالب</p>
@@ -39,7 +39,7 @@ export const TemplateGrid = memo(function TemplateGrid({
               onClick={() => onSelect(template.id)}
               className="block w-full p-4 text-right"
             >
-              <span className="mb-4 flex aspect-4/3 items-center justify-center rounded-xl bg-linear-to-br from-primary to-accent text-3xl font-bold text-white">
+              <span className="mb-4 flex aspect-4/3 items-center justify-center rounded-xl bg-primary text-3xl font-bold text-white">
                 صورة
               </span>
               <span className="block truncate font-bold">{template.name}</span>

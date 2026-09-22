@@ -58,7 +58,7 @@ export const Checkout = memo(function Checkout({
   });
 
   return (
-    <section className="self-start rounded-3xl bg-primary p-6 text-white shadow-xl shadow-primary/15 sm:p-8 md:col-span-4 md:sticky md:top-6">
+    <section className="self-start w-full  rounded-3xl bg-primary p-6 text-white shadow-xl shadow-primary/15 sm:p-8 md:col-span-5 md:sticky md:top-6">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-white/15 pb-5">
         <div>
           <p className="mb-2 text-sm font-semibold text-white/65">checkout</p>
@@ -165,16 +165,17 @@ export const Checkout = memo(function Checkout({
         </p>
       )}
 
-      <div className="mt-6 flex flex-col items-end gap-4 border-t border-white/15 pt-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+      <div className="flex items-center justify-between gap-3 pt-6">
+        <div className="flex flex-col gap-3 text-sm text-white/85">
           <span className="text-sm text-white/65">الإجمالي النهائي</span>
           <strong className="mr-3 text-3xl">{money(totalPrice)}</strong>
         </div>
+
         <button
           type="button"
           disabled={isBusy || draftPhotos.length === 0}
           onClick={() => void handleFinalize()}
-          className="h-14 w-full rounded-xl bg-white px-8 font-bold text-primary hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
+          className="h-14 rounded-xl bg-white px-8 font-bold text-primary hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
         >
           تأكيد الطلب
         </button>
