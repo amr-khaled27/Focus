@@ -8,12 +8,13 @@ import {
   getPhotosWithNoOrder,
   insertDraftPhoto,
 } from "@main/db/index";
-import { ipcMain } from "electron";
+import { handle } from "@main/utils/handle";
+import { PhotoTemplate } from "@shared/types/PhotoTemplate";
 
 export default function handlePhotoCatalog(
   mainWindow: Electron.BrowserWindow | null,
 ) {
-  ipcMain.handle("getPhotoTemplates", async (event) => {
+  handle(mainWindow, "getPhotoTemplates", async (event) => {
     if (!isTrustedSender(event, mainWindow)) {
       return { success: false, error: "طلب غير موثوق" };
     }
@@ -27,21 +28,27 @@ export default function handlePhotoCatalog(
     }
   });
 
-  ipcMain.handle("createPhotoTemplate", async (event, payload) => {
-    if (!isTrustedSender(event, mainWindow)) {
-      return { success: false, error: "طلب غير موثوق" };
-    }
-    try {
-      return { success: true, template: await createPhotoTemplate(payload) };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "فشل إنشاء القالب",
-      };
-    }
-  });
+  handle(
+    mainWindow,
+    "createPhotoTemplate",
+    async (event, ...args: unknown[]) => {
+      const payload = args[0] as Omit<PhotoTemplate, "id">;
+      if (!isTrustedSender(event, mainWindow)) {
+        return { success: false, error: "طلب غير موثوق" };
+      }
+      try {
+        return { success: true, template: await createPhotoTemplate(payload) };
+      } catch (error) {
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : "فشل إنشاء القالب",
+        };
+      }
+    },
+  );
 
-  ipcMain.handle("editTemplate", async (event, templateId: number, payload) => {
+  handle(mainWindow, "editTemplate", async (event, ...args: unknown[]) => {
+    const [templateId, payload] = args as [number, Omit<PhotoTemplate, "id">];
     if (!isTrustedSender(event, mainWindow)) {
       return { success: false, error: "طلب غير موثوق" };
     }
@@ -58,7 +65,14 @@ export default function handlePhotoCatalog(
     }
   });
 
-  ipcMain.handle("insertDraftPhoto", async (event, payload) => {
+  handle(mainWindow, "insertDraftPhoto", async (event, ...args: unknown[]) => {
+    const payload = args[0] as {
+      templateId: number;
+      personName?: string | null;
+      photoName?: string | null;
+      qty: number;
+    };
+
     if (!isTrustedSender(event, mainWindow)) {
       return { success: false, error: "طلب غير موثوق" };
     }
@@ -72,7 +86,16 @@ export default function handlePhotoCatalog(
     }
   });
 
-  ipcMain.handle("editDraftPhoto", async (event, photoId: number, payload) => {
+  handle(mainWindow, "editDraftPhoto", async (event, ...args: unknown[]) => {
+    const [photoId, payload] = args as [
+      number,
+      {
+        templateId: number;
+        personName?: string | null;
+        photoName?: string | null;
+        qty: number;
+      },
+    ];
     if (!isTrustedSender(event, mainWindow)) {
       return { success: false, error: "طلب غير موثوق" };
     }
@@ -89,7 +112,7 @@ export default function handlePhotoCatalog(
     }
   });
 
-  ipcMain.handle("getDraftPhotos", async (event) => {
+  handle(mainWindow, "getDraftPhotos", async (event) => {
     if (!isTrustedSender(event, mainWindow)) {
       return { success: false, error: "طلب غير موثوق" };
     }
@@ -103,7 +126,8 @@ export default function handlePhotoCatalog(
     }
   });
 
-  ipcMain.handle("deleteDraftPhoto", async (event, photoId: number) => {
+  handle(mainWindow, "deleteDraftPhoto", async (event, ...args: unknown[]) => {
+    const photoId = args[0] as number;
     if (!isTrustedSender(event, mainWindow)) {
       return { success: false, error: "طلب غير موثوق" };
     }

@@ -1,5 +1,4 @@
 import { ElectronAPI } from "@electron-toolkit/preload";
-import { Photo } from "@shared/types/Photo";
 import { PhotoTemplate } from "@shared/types/PhotoTemplate";
 import { EventPayloadMapping } from "@shared/types/EventPayloadMapping";
 
@@ -30,30 +29,21 @@ declare global {
 
       // photo
       getPhotoTemplates: () => Promise<
-        | { success: true; templates: PhotoTemplate[] }
-        | { success: false; error: string }
+        EventPayloadMapping["getPhotoTemplates"]
       >;
       createPhotoTemplate: (
         payload: Omit<PhotoTemplate, "id">,
-      ) => Promise<
-        | { success: true; template: PhotoTemplate }
-        | { success: false; error: string }
-      >;
+      ) => Promise<EventPayloadMapping["createPhotoTemplate"]>;
       editTemplate: (
         templateId: number,
         payload: Omit<PhotoTemplate, "id">,
-      ) => Promise<
-        | { success: true; template: PhotoTemplate }
-        | { success: false; error: string }
-      >;
+      ) => Promise<EventPayloadMapping["editTemplate"]>;
       insertDraftPhoto: (payload: {
         templateId: number;
         personName?: string | null;
         photoName?: string | null;
         qty: number;
-      }) => Promise<
-        { success: true; photo: Photo } | { success: false; error: string }
-      >;
+      }) => Promise<EventPayloadMapping["insertDraftPhoto"]>;
       editDraftPhoto: (
         photoId: number,
         payload: {
@@ -62,22 +52,16 @@ declare global {
           photoName?: string | null;
           qty: number;
         },
-      ) => Promise<
-        { success: true; photo: Photo } | { success: false; error: string }
-      >;
-      getDraftPhotos: () => Promise<
-        { success: true; photos: Photo[] } | { success: false; error: string }
-      >;
+      ) => Promise<EventPayloadMapping["editDraftPhoto"]>;
+      getDraftPhotos: () => Promise<EventPayloadMapping["getDraftPhotos"]>;
       deleteDraftPhoto: (
         photoId: number,
-      ) => Promise<{ success: true } | { success: false; error: string }>;
-      finalizeOrder: ({ customerPaid }: { customerPaid: number }) => Promise<
-        | {
-            success: true;
-            order: { id: number; itemCount: number; total: number };
-          }
-        | { success: false; error: string }
-      >;
+      ) => Promise<EventPayloadMapping["deleteDraftPhoto"]>;
+      finalizeOrder: ({
+        customerPaid,
+      }: {
+        customerPaid: number;
+      }) => Promise<EventPayloadMapping["finalizeOrder"]>;
     };
   }
 }

@@ -253,16 +253,18 @@ export async function finalizeDraftOrder(payload: {
       throw new Error("Draft batch is empty");
     }
 
+    const total = draftPhotos.reduce(
+      (sum, photo) => sum + photo.price * photo.qty,
+      0,
+    );
+
     const orderResult = await transaction
       .insert(orders)
       .values({
         createdAt: new Date().toISOString(),
         userId: session[0].userId,
         customerPaid: payload.customerPaid,
-        total: draftPhotos.reduce(
-          (sum, photo) => sum + photo.price * photo.qty,
-          0,
-        ),
+        total,
       })
       .returning();
     const order = orderResult[0];
@@ -283,10 +285,7 @@ export async function finalizeDraftOrder(payload: {
     return {
       id: order.id,
       itemCount: draftPhotos.reduce((sum, photo) => sum + photo.qty, 0),
-      total: draftPhotos.reduce(
-        (sum, photo) => sum + photo.price * photo.qty,
-        0,
-      ),
+      total,
     };
   });
 }

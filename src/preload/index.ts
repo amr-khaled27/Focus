@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
 import { invoke } from "./utils";
 
@@ -13,19 +13,16 @@ const api = {
   logout: () => invoke("logout"),
 
   // photo
-  getPhotoTemplates: () => ipcRenderer.invoke("getPhotoTemplates"),
-  createPhotoTemplate: (payload) =>
-    ipcRenderer.invoke("createPhotoTemplate", payload),
+  getPhotoTemplates: () => invoke("getPhotoTemplates"),
+  createPhotoTemplate: (payload) => invoke("createPhotoTemplate", payload),
   editTemplate: (templateId, payload) =>
-    ipcRenderer.invoke("editTemplate", templateId, payload),
-  insertDraftPhoto: (payload) =>
-    ipcRenderer.invoke("insertDraftPhoto", payload),
+    invoke("editTemplate", templateId, payload),
+  insertDraftPhoto: (payload) => invoke("insertDraftPhoto", payload),
   editDraftPhoto: (photoId, payload) =>
-    ipcRenderer.invoke("editDraftPhoto", photoId, payload),
-  getDraftPhotos: () => ipcRenderer.invoke("getDraftPhotos"),
-  deleteDraftPhoto: (photoId) =>
-    ipcRenderer.invoke("deleteDraftPhoto", photoId),
-  finalizeOrder: (payload) => ipcRenderer.invoke("finalizeOrder", payload),
+    invoke("editDraftPhoto", photoId, payload),
+  getDraftPhotos: () => invoke("getDraftPhotos"),
+  deleteDraftPhoto: (photoId) => invoke("deleteDraftPhoto", photoId),
+  finalizeOrder: (payload) => invoke("finalizeOrder", payload),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

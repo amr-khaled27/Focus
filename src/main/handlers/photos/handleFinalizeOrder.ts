@@ -1,16 +1,26 @@
 import isTrustedSender from "@main/utils/isTrustedSender";
 import { finalizeDraftOrder } from "@main/db";
-import { ipcMain } from "electron";
+import { handle } from "@main/utils/handle";
 
 export default function handleFinalizeOrder(
   mainWindow: Electron.BrowserWindow | null,
 ) {
-  ipcMain.handle("finalizeOrder", async (event, payload) => {
+  handle(mainWindow, "finalizeOrder", async (event, ...args: unknown[]) => {
     if (!isTrustedSender(event, mainWindow)) {
       return { success: false, error: "طلب غير موثوق" };
     }
+
+    const payload = args[0] as { customerPaid: number };
     try {
-      return { success: true, order: await finalizeDraftOrder(payload) };
+      const order = await finalizeDraftOrder(payload);
+      return {
+        success: true,
+        order: {
+          orderId: order.id,
+          itemCount: order.itemCount,
+          total: order.total,
+        },
+      };
     } catch (error) {
       return {
         success: false,
