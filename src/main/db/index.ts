@@ -10,6 +10,7 @@ import {
   photos,
   photoTemplates,
   orders,
+  payments,
   orderItems,
 } from "./schema";
 import { User } from "@shared/types/User";
@@ -258,16 +259,26 @@ export async function finalizeDraftOrder(payload: {
       0,
     );
 
+    const status = payload.customerPaid >= total ? "paid" : "pending";
+
     const orderResult = await transaction
       .insert(orders)
       .values({
         createdAt: new Date().toISOString(),
         userId: session[0].userId,
-        customerPaid: payload.customerPaid,
         total,
+        status,
       })
       .returning();
     const order = orderResult[0];
+
+    await transaction.insert(payments).values({
+      type: "order",
+      orderId: order.id,
+      userId: session[0].userId,
+      amount: payload.customerPaid,
+      createdAt: new Date().toISOString(),
+    });
 
     await transaction.insert(orderItems).values(
       draftPhotos.map((photo) => ({

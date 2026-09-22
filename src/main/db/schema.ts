@@ -51,8 +51,21 @@ export const orders = sqliteTable("orders", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  customerPaid: real("customer_paid").notNull(),
   total: real("total").notNull(),
+  status: text("status").default("pending").notNull(),
+});
+
+export const payments = sqliteTable("payments", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  type: text("type").notNull(),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orders.id, { onDelete: "cascade" }),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  amount: real("amount").notNull(),
+  createdAt: text("created_at").notNull(),
 });
 
 export const orderItems = sqliteTable("order_items", {
