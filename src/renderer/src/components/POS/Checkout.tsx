@@ -2,7 +2,7 @@ import { Input } from "@renderer/components/Input";
 import usePhotosStore from "@renderer/store/photos";
 import { memo, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
-import { ShoppingBagIcon } from "lucide-react";
+import { ShoppingBagIcon, Image } from "lucide-react";
 
 type CheckoutFormValues = {
   customerPaid: string;
@@ -97,9 +97,6 @@ export const Checkout = memo(function Checkout({
                 className="flex flex-col gap-2 rounded-2xl bg-white/10 p-4"
               >
                 <div className="min-w-0 flex items-center gap-4">
-                  <p className="truncate font-bold">
-                    {template?.name || "صورة"}
-                  </p>
                   <p className="mt-1 text-sm text-white/65">
                     {photo.photoName || "بدون رقم صورة"} ·{" "}
                     {photo.personName || "بدون اسم شخص"}
@@ -112,8 +109,12 @@ export const Checkout = memo(function Checkout({
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-secondary/70 text-xl font-bold">
-                      ص
+                      <Image className="h-8 w-8" />
                     </div>
+
+                    <p className="truncate font-bold">
+                      {template?.name || "صورة"}
+                    </p>
                   </div>
 
                   <div className="flex items-center justify-between gap-5 sm:justify-end">
@@ -126,7 +127,7 @@ export const Checkout = memo(function Checkout({
                       onClick={() =>
                         photo.id !== undefined && onEditPhoto(photo.id)
                       }
-                      className="text-sm font-bold text-white/70 hover:text-white"
+                      className="text-sm font-bold text-white opacity-70 hover:text-white"
                     >
                       تعديل
                     </button>
@@ -134,7 +135,7 @@ export const Checkout = memo(function Checkout({
                       type="button"
                       disabled={isBusy}
                       onClick={() => void handleDelete(photo.id)}
-                      className="text-sm font-bold text-red-200 hover:text-white"
+                      className="text-sm font-bold text-red-300 opacity-70 hover:text-red-500"
                     >
                       حذف
                     </button>
