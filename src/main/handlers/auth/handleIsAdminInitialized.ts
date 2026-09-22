@@ -1,26 +1,29 @@
 import { checkAdminInitialized } from "@main/utils/checkAdminInitialized";
-import { ipcMain } from "electron";
 import isTrustedSender from "@main/utils/isTrustedSender";
+import { handle } from "@main/utils/handle";
 
 export function handleIsAdminInitialized(
   mainWindow: Electron.BrowserWindow | null,
 ) {
-  ipcMain.handle("isAdminInitialized", async (event) => {
+  handle(mainWindow, "isAdminInitialized", async (event) => {
     if (!isTrustedSender(event, mainWindow)) {
-      return { success: false, error: "طلب غير موثوق" };
+      return { success: false, isInitialized: false, error: "طلب غير موثوق" };
     }
     try {
-      return await checkAdminInitialized();
+      const isInitialized = await checkAdminInitialized();
+      console.log("isAdminInitialized:", isInitialized);
+      return { success: true, isInitialized };
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Failed to check admin initialization:", error);
         return {
           success: false,
+          isInitialized: false,
           error: error.message,
         };
       } else {
         return {
           success: false,
+          isInitialized: false,
           error: "Failed to check admin initialization",
         };
       }

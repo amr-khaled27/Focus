@@ -1,7 +1,7 @@
 import { ElectronAPI } from "@electron-toolkit/preload";
-import { User } from "@shared/types/User";
 import { Photo } from "@shared/types/Photo";
 import { PhotoTemplate } from "@shared/types/PhotoTemplate";
+import { EventPayloadMapping } from "@shared/types/EventPayloadMapping";
 
 type unsubscribe = () => void;
 
@@ -9,31 +9,26 @@ declare global {
   interface Window {
     electron: ElectronAPI;
     api: {
-      getUsers: () => Promise<Omit<User, "pin">[]>;
-      isAdminInitialized: () => Promise<boolean>;
+      // auth
+      getUsers: () => Promise<EventPayloadMapping["getUsers"]>;
       initAdmin: (payload: {
         name: string;
         email: string;
         pin: string;
-      }) => Promise<
-        | {
-            success: true;
-            user: Pick<User, "id" | "name" | "email" | "role">;
-          }
-        | { success: false; error: string }
+      }) => Promise<EventPayloadMapping["initAdmin"]>;
+      isAdminInitialized: () => Promise<
+        EventPayloadMapping["isAdminInitialized"]
       >;
-      isUserAuthenticated: () => Promise<{
-        authenticated: boolean;
-        user: Omit<User, "pin"> | null;
-      }>;
-      login: (payload: { userId: number; pin: string }) => Promise<
-        | {
-            success: true;
-            user: Pick<User, "id" | "name" | "email" | "role">;
-          }
-        | { success: false; error: string }
+      isUserAuthenticated: () => Promise<
+        EventPayloadMapping["isUserAuthenticated"]
       >;
-      logout: () => Promise<{ success: boolean }>;
+      login: (payload: {
+        userId: number;
+        pin: string;
+      }) => Promise<EventPayloadMapping["login"]>;
+      logout: () => Promise<EventPayloadMapping["logout"]>;
+
+      // photo
       getPhotoTemplates: () => Promise<
         | { success: true; templates: PhotoTemplate[] }
         | { success: false; error: string }

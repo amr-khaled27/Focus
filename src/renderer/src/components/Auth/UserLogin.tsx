@@ -42,7 +42,16 @@ export default function UserLogin() {
   useEffect(() => {
     window.api
       .getUsers()
-      .then(setUsers)
+      .then((result) => {
+        if (result.success) {
+          setUsers(result.users || []);
+        } else {
+          setUsers([]);
+          setFormError("root", {
+            message: result.error || "Unable to load accounts",
+          });
+        }
+      })
       .catch(() => {
         setUsers([]);
         setFormError("root", { message: "Unable to load accounts" });
@@ -59,6 +68,11 @@ export default function UserLogin() {
 
     if (!result.success) {
       setFormError("root", { message: result.error });
+      return;
+    }
+
+    if (!result.user) {
+      setFormError("root", { message: "Login failed: No user data returned" });
       return;
     }
 

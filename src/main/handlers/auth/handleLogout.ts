@@ -1,9 +1,9 @@
-import { ipcMain } from "electron";
 import { clearSession } from "@main/db/index";
 import isTrustedSender from "@main/utils/isTrustedSender";
+import { handle } from "@main/utils/handle";
 
 export function handleLogout(mainWindow: Electron.BrowserWindow | null) {
-  ipcMain.handle("logout", async (event) => {
+  handle(mainWindow, "logout", async (event) => {
     if (!isTrustedSender(event, mainWindow)) {
       return { success: false, error: "طلب غير موثوق" };
     }

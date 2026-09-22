@@ -15,15 +15,17 @@ const useSettingsStore = create<SettingsState>((set, get) => ({
     set({ isChecking: true });
 
     try {
-      const isAdminInitialized = await window.api.isAdminInitialized();
-      set({ isAdminInitialized });
+      const res = await window.api.isAdminInitialized();
+      console.log("isAdminInitialized:", res.isInitialized);
+      set({ isAdminInitialized: res.isInitialized });
 
-      if (!isAdminInitialized) {
+      if (!res.isInitialized) {
         set({ user: null, isAuthenticated: false, isChecking: false });
         return;
       }
 
       const session = await window.api.isUserAuthenticated();
+      console.log("isUserAuthenticated:", session.authenticated);
       set({
         user: session.user,
         isAuthenticated: session.authenticated,

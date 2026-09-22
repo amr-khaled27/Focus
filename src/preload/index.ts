@@ -1,14 +1,18 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
+import { invoke } from "./utils";
 
 // Custom APIs for renderer
 const api = {
-  getUsers: () => ipcRenderer.invoke("getUsers"),
-  isAdminInitialized: () => ipcRenderer.invoke("isAdminInitialized"),
-  initAdmin: (payload) => ipcRenderer.invoke("initAdmin", payload),
-  isUserAuthenticated: () => ipcRenderer.invoke("isUserAuthenticated"),
-  login: (payload) => ipcRenderer.invoke("login", payload),
-  logout: () => ipcRenderer.invoke("logout"),
+  // auth
+  getUsers: () => invoke("getUsers"),
+  isAdminInitialized: () => invoke("isAdminInitialized"),
+  initAdmin: (payload) => invoke("initAdmin", payload),
+  isUserAuthenticated: () => invoke("isUserAuthenticated"),
+  login: (payload) => invoke("login", payload),
+  logout: () => invoke("logout"),
+
+  // photo
   getPhotoTemplates: () => ipcRenderer.invoke("getPhotoTemplates"),
   createPhotoTemplate: (payload) =>
     ipcRenderer.invoke("createPhotoTemplate", payload),
