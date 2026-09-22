@@ -29,7 +29,7 @@ type TemplateModalState = {
   editingId: number | null;
 };
 
-export default function POSMain() {
+export default function POSMainPage() {
   const user = useSettingsStore((state) => state.user);
   const clearUser = useSettingsStore((state) => state.clearUser);
   const loadTemplates = usePhotosStore((state) => state.loadTemplates);
@@ -163,7 +163,7 @@ export default function POSMain() {
         </div>
       </header>
 
-      <div className="grid min-h-0 flex-1 w-full gap-4 overflow-y-auto p-2 md:grid-cols-12 md:items-start lg:gap-8 lg:p-4">
+      <div className="grid min-h-0 flex-1 w-full gap-4 overflow-y-auto md:grid-cols-12 md:items-start lg:gap-8">
         <TemplateGrid
           selectedTemplateId={itemTemplateId}
           onSelect={openItemModal}

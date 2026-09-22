@@ -1,5 +1,6 @@
 import usePhotosStore from "@renderer/store/photos";
 import { memo } from "react";
+import { Plus, Image } from "lucide-react";
 
 const money = (value: number) => `${value.toFixed(2)} ج.م`;
 
@@ -19,7 +20,7 @@ export const TemplateGrid = memo(function TemplateGrid({
   const templates = usePhotosStore((state) => state.templates);
 
   return (
-    <section className="min-w-0 md:col-span-7">
+    <section className="min-w-0 md:col-span-7 pr-4">
       <div className="mb-5 flex items-end justify-between gap-4">
         <div>
           <p className="mb-2 text-sm font-semibold text-accent">القوالب</p>
@@ -40,7 +41,7 @@ export const TemplateGrid = memo(function TemplateGrid({
               className="block w-full p-4 text-right"
             >
               <span className="mb-4 flex aspect-4/3 items-center justify-center rounded-xl bg-primary text-3xl font-bold text-white">
-                صورة
+                <Image className="h-12 w-12" />
               </span>
               <span className="block truncate font-bold">{template.name}</span>
               <span className="mt-1 block text-xs text-slate-500">
@@ -65,7 +66,7 @@ export const TemplateGrid = memo(function TemplateGrid({
           className="flex min-h-52 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 p-4 text-center text-primary transition hover:border-primary hover:bg-primary/10"
         >
           <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-2xl text-white">
-            +
+            <Plus />
           </span>
           <span className="font-bold">إضافة قالب جديد</span>
         </button>

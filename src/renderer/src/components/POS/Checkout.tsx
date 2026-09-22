@@ -2,6 +2,7 @@ import { Input } from "@renderer/components/Input";
 import usePhotosStore from "@renderer/store/photos";
 import { memo, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
+import { ShoppingBagIcon } from "lucide-react";
 
 type CheckoutFormValues = {
   customerPaid: string;
@@ -58,10 +59,12 @@ export const Checkout = memo(function Checkout({
   });
 
   return (
-    <section className="self-start w-full  rounded-3xl bg-primary p-6 text-white shadow-xl shadow-primary/15 sm:p-8 md:col-span-5 md:sticky md:top-6">
+    <section className="self-start w-full  rounded-tr-3xl rounded-br-3xl bg-primary p-6 text-white shadow-xl shadow-primary/15 sm:p-8 md:col-span-5 md:sticky md:top-6">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-white/15 pb-5">
         <div>
-          <p className="mb-2 text-sm font-semibold text-white/65">checkout</p>
+          <p className="mb-2 text-sm font-semibold text-white opacity-60">
+            سلة المنتجات
+          </p>
           <h2 className="text-3xl font-bold">طلبك الحالي</h2>
         </div>
         <div className="flex gap-3 text-sm">
@@ -75,10 +78,12 @@ export const Checkout = memo(function Checkout({
       </div>
 
       {draftPhotos.length === 0 ? (
-        <div className="py-16 text-center text-white/60">
-          <div className="mb-3 text-4xl">◫</div>
-          <p className="font-bold text-white/80">checkout فارغ</p>
-          <p className="mt-1 text-sm">اختر قالبًا من الأعلى لإضافة أول عنصر.</p>
+        <div className="py-16 text-center text-white opacity-60">
+          <div className="mb-3 flex justify-center ">
+            <ShoppingBagIcon className="w-12 h-12" />
+          </div>
+          <p className="font-bold text-white/80">قائمة المنتجات فارغة</p>
+          <p className="mt-1 text-sm">اختر قالبًا من الأعلى لإضافة أول منتج.</p>
         </div>
       ) : (
         <div className="space-y-3">

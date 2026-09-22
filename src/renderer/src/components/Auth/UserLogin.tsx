@@ -5,6 +5,7 @@ import useSettingsStore from "@renderer/store/settings";
 import { User } from "@shared/types/User";
 import { Input } from "@renderer/components/Input";
 import { PasswordVisibilityToggle } from "./PasswordVisibilityToggle";
+import { UserCog2, User2 } from "lucide-react";
 
 type LoginUser = Omit<User, "pin">;
 
@@ -138,28 +139,44 @@ export default function UserLogin() {
                           : "border-slate-200 hover:border-primary/50 hover:bg-slate-50"
                     }`}
                   >
-                    <span
-                      className={`block font-semibold ${
-                        user.role === "admin" ? "text-white" : "text-text"
-                      }`}
-                    >
-                      {user.name}
-                    </span>
-                    <span
-                      className={`mt-1 block text-sm ${
-                        user.role === "admin"
-                          ? "text-white/75"
-                          : "text-slate-500"
-                      }`}
-                      dir="ltr"
-                    >
-                      {user.email}
-                    </span>
-                    {user.role === "admin" && (
-                      <span className="mt-3 inline-block text-xs font-semibold text-white/80">
-                        المسؤول
-                      </span>
-                    )}
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <span
+                          className={`block font-semibold ${
+                            user.role === "admin" ? "text-white" : "text-text"
+                          }`}
+                        >
+                          {user.name}
+                        </span>
+                        <span
+                          className={`mt-1 block text-sm ${
+                            user.role === "admin"
+                              ? "text-white/75"
+                              : "text-slate-500"
+                          }`}
+                          dir="ltr"
+                        >
+                          {user.email}
+                        </span>
+                        {user.role === "admin" && (
+                          <span className="mt-3 inline-block text-xs font-semibold text-white/80">
+                            المسؤول
+                          </span>
+                        )}
+                      </div>
+
+                      <div>
+                        {user.role === "admin" ? (
+                          <div className="flex items-center justify-center">
+                            <UserCog2 className="h-9 w-9" />
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center">
+                            <User2 className="h-9 w-9" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -190,7 +207,7 @@ export default function UserLogin() {
                     })}
                     autoFocus
                     dir="ltr"
-                    className="pl-12 text-left text-lg tracking-[0.35em]"
+                    className="pl-14 text-left text-lg tracking-[0.35em]"
                   >
                     <Input.Adornment>
                       <PasswordVisibilityToggle

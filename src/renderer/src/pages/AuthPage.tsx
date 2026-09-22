@@ -3,7 +3,7 @@ import useSettingsStore from "@renderer/store/settings";
 import AdminSignUp from "@renderer/components/Auth/AdminSignUp";
 import UserLogin from "@renderer/components/Auth/UserLogin";
 
-export default function SetupAdmin() {
+export default function AuthPage() {
   const { isAdminInitialized, isAuthenticated, isChecking } =
     useSettingsStore();
 

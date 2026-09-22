@@ -60,7 +60,7 @@ function InputControl({
         {...inputProps}
         {...registration}
         onChange={handleChange}
-        className={`h-14 w-full rounded-xl border border-slate-200 bg-background px-4 text-base text-text outline-none transition placeholder:text-slate-400 focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/10 ${className}`}
+        className={`h-14 w-full rounded-xl border border-slate-400 bg-background px-4 text-base text-text outline-none transition placeholder:text-slate-400 focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/10 ${className}`}
       />
       {children}
     </div>

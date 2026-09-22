@@ -36,14 +36,26 @@ export default function AdminSignUp() {
     try {
       const res = await window.api.initAdmin(data);
 
+      if (!res.user) {
+        setSubmitError(res.error || "حدث خطأ أثناء إنشاء الحساب");
+        return;
+      }
+
       if (res.success) {
         setIsAdminInitialized(true);
-        setUser(res.user);
+        setUser({
+          id: res.user.id,
+          name: res.user.name,
+          email: res.user.email,
+          role: res.user.role,
+        });
         navigate("/pos", { replace: true });
         return;
       }
 
-      setSubmitError(res.error);
+      if (res.error) {
+        setSubmitError(res.error);
+      }
     } catch {
       setSubmitError("حدث خطأ أثناء إنشاء الحساب");
     }
@@ -129,7 +141,7 @@ export default function AdminSignUp() {
                   maxLength={6}
                   placeholder="••••••"
                   dir="ltr"
-                  className="pl-12 text-left text-lg tracking-[0.35em]"
+                  className="pl-14 text-left text-lg tracking-[0.35em]"
                   numericOnly
                   registration={register("pin")}
                 >
