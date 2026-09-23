@@ -1,5 +1,6 @@
-import { Input } from "@renderer/components/Input";
+import { Input } from "@renderer/components/shared/Input";
 import usePhotosStore from "@renderer/store/photos";
+import usePaperStore from "@renderer/store/paper";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -11,7 +12,9 @@ type ItemFormValues = {
 
 type ItemModalProps = {
   templateId: number | null;
-  photoId: number | null;
+  type?: "photo" | "paper" | null;
+  editingItemId?: number | null;
+  photoId?: number | null; // Kept for backward compatibility
   isBusy?: boolean;
   onClose: () => void;
 };
@@ -22,46 +25,96 @@ const money = (value: number) => `${value.toFixed(2)} ج.م`;
 export function ItemModal({
   templateId,
   photoId,
+  type = "photo",
+  editingItemId,
   isBusy = false,
   onClose,
 }: ItemModalProps) {
-  const templates = usePhotosStore((state) => state.templates);
+  const activeItemId = editingItemId ?? photoId ?? null;
+  const activeType = type ?? "photo";
+
+  // Stores
+  const photoTemplates = usePhotosStore((state) => state.templates);
   const draftPhotos = usePhotosStore((state) => state.draftPhotos);
   const addDraftPhoto = usePhotosStore((state) => state.addDraftPhoto);
   const editDraftPhoto = usePhotosStore((state) => state.editDraftPhoto);
+
+  const paperTemplates = usePaperStore((state) => state.paperTemplates);
+  const draftPaperItems = usePaperStore((state) => state.draftPaperItems);
+  const addDraftPaperItem = usePaperStore((state) => state.addDraftPaperItem);
+  const editDraftPaperItem = usePaperStore((state) => state.editDraftPaperItem);
+
   const [isSaving, setIsSaving] = useState(false);
   const form = useForm<ItemFormValues>({ defaultValues: emptyItem });
-  const selectedTemplate = templates.find((item) => item.id === templateId);
-  const editingPhoto = draftPhotos.find((item) => item.id === photoId);
+
+  // Selected Template
+  const selectedTemplate =
+    activeType === "paper"
+      ? paperTemplates.find((item) => item.id === templateId)
+      : photoTemplates.find((item) => item.id === templateId);
+
+  // Editing Draft Item
+  const editingPhoto =
+    activeType === "photo"
+      ? draftPhotos.find((item) => item.id === activeItemId)
+      : null;
+
+  const editingPaperItem =
+    activeType === "paper"
+      ? draftPaperItems.find((item) => item.id === activeItemId)
+      : null;
 
   useEffect(() => {
-    form.reset(
-      editingPhoto
-        ? {
-            personName: editingPhoto.personName || "",
-            photoName: editingPhoto.photoName || "",
-            qty: String(editingPhoto.qty ?? 1),
-          }
-        : emptyItem,
-    );
-  }, [editingPhoto, form]);
+    if (activeType === "photo" && editingPhoto) {
+      form.reset({
+        personName: editingPhoto.personName || "",
+        photoName: editingPhoto.photoName || "",
+        qty: String(editingPhoto.qty ?? 1),
+      });
+    } else if (activeType === "paper" && editingPaperItem) {
+      form.reset({
+        personName: "",
+        photoName: "",
+        qty: String(editingPaperItem.qty ?? 1),
+      });
+    } else {
+      form.reset(emptyItem);
+    }
+  }, [activeType, editingPhoto, editingPaperItem, form]);
 
   if (templateId === null) return null;
 
   const handleSubmit = async (values: ItemFormValues) => {
+    if (!templateId) return;
     setIsSaving(true);
-    const input = {
-      templateId,
-      personName: values.personName.trim() || undefined,
-      photoName: values.photoName.trim() || undefined,
-      qty: Number(values.qty),
-    };
-    const result =
-      photoId === null
-        ? await addDraftPhoto(input)
-        : await editDraftPhoto(photoId, input);
-    setIsSaving(false);
-    if (result.success) onClose();
+
+    if (activeType === "paper") {
+      const input = {
+        paperTemplateId: templateId,
+        qty: Number(values.qty),
+      };
+      const result =
+        activeItemId === null
+          ? await addDraftPaperItem(input)
+          : await editDraftPaperItem(activeItemId, input);
+
+      setIsSaving(false);
+      if (result.success) onClose();
+    } else {
+      const input = {
+        templateId,
+        personName: values.personName.trim() || undefined,
+        photoName: values.photoName.trim() || undefined,
+        qty: Number(values.qty),
+      };
+      const result =
+        activeItemId === null
+          ? await addDraftPhoto(input)
+          : await editDraftPhoto(activeItemId, input);
+
+      setIsSaving(false);
+      if (result.success) onClose();
+    }
   };
 
   return (
@@ -78,10 +131,11 @@ export function ItemModal({
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-accent">
-              {selectedTemplate?.name || "بيانات الصورة"}
+              {selectedTemplate?.name ||
+                (activeType === "paper" ? "بيانات الورق" : "بيانات الصورة")}
             </p>
             <h2 className="mt-1 text-2xl font-bold">
-              {photoId === null ? "إضافة إلى checkout" : "تعديل العنصر"}
+              {activeItemId === null ? "إضافة إلى checkout" : "تعديل العنصر"}
             </h2>
           </div>
           <button
@@ -92,6 +146,7 @@ export function ItemModal({
             ×
           </button>
         </div>
+
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="rounded-2xl bg-background p-4 text-sm">
             <span className="text-slate-500">السعر</span>
@@ -99,20 +154,27 @@ export function ItemModal({
               {selectedTemplate ? money(selectedTemplate.price) : "-"}
             </strong>
           </div>
-          <Input.Root>
-            <Input.Label>
-              رقم الصورة{" "}
-              <span className="font-normal text-slate-400">(اختياري)</span>
-            </Input.Label>
-            <Input.Control registration={form.register("photoName")} />
-          </Input.Root>
-          <Input.Root>
-            <Input.Label>
-              اسم الشخص{" "}
-              <span className="font-normal text-slate-400">(اختياري)</span>
-            </Input.Label>
-            <Input.Control registration={form.register("personName")} />
-          </Input.Root>
+
+          {/* Render extra details only for Photo items */}
+          {activeType === "photo" && (
+            <>
+              <Input.Root>
+                <Input.Label>
+                  رقم الصورة{" "}
+                  <span className="font-normal text-slate-400">(اختياري)</span>
+                </Input.Label>
+                <Input.Control registration={form.register("photoName")} />
+              </Input.Root>
+              <Input.Root>
+                <Input.Label>
+                  اسم الشخص{" "}
+                  <span className="font-normal text-slate-400">(اختياري)</span>
+                </Input.Label>
+                <Input.Control registration={form.register("personName")} />
+              </Input.Root>
+            </>
+          )}
+
           <Input.Root>
             <Input.Label>العدد</Input.Label>
             <Input.Control
@@ -122,12 +184,13 @@ export function ItemModal({
               registration={form.register("qty", { required: true, min: "1" })}
             />
           </Input.Root>
+
           <button
             type="submit"
             disabled={isBusy || isSaving || !selectedTemplate}
             className="h-14 w-full rounded-xl bg-primary font-bold text-white disabled:opacity-50"
           >
-            {photoId === null ? "إضافة إلى checkout" : "حفظ التعديل"}
+            {activeItemId === null ? "إضافة إلى checkout" : "حفظ التعديل"}
           </button>
         </form>
       </div>

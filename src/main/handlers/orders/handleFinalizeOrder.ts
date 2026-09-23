@@ -16,7 +16,7 @@ export default function handleFinalizeOrder(
       return {
         success: true,
         order: {
-          orderId: order.id,
+          id: order.id,
           itemCount: order.itemCount,
           total: order.total,
         },

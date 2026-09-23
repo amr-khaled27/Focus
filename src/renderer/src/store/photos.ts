@@ -71,7 +71,6 @@ const usePhotosStore = create<PhotosState>((set) => ({
     return {
       success: true,
       value: {
-        id: response.order.orderId,
         itemCount: response.order.itemCount,
         total: response.order.total,
       },

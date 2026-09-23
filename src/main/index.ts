@@ -11,7 +11,8 @@ import { handleLogout } from "./handlers/auth/handleLogout";
 import { handleLogin } from "./handlers/auth/handleLogin";
 import handleGetUsers from "./handlers/auth/handleGetUsers";
 import handlePhotoCatalog from "./handlers/photos/handlePhotoCatalog";
-import handleFinalizeOrder from "./handlers/photos/handleFinalizeOrder";
+import handlePaperCatalog from "./handlers/paper/handlePaperCatalog";
+import handleFinalizeOrder from "./handlers/orders/handleFinalizeOrder";
 import { store } from "./store";
 
 let splashWindow: BrowserWindow | null = null;
@@ -118,6 +119,7 @@ app.whenReady().then(async () => {
   handleGetUsers(mainWindow);
   handlePhotoCatalog(mainWindow);
   handleFinalizeOrder(mainWindow);
+  handlePaperCatalog(mainWindow);
 
   app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the

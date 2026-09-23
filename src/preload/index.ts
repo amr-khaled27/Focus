@@ -22,6 +22,22 @@ const api = {
     invoke("editDraftPhoto", photoId, payload),
   getDraftPhotos: () => invoke("getDraftPhotos"),
   deleteDraftPhoto: (photoId) => invoke("deleteDraftPhoto", photoId),
+
+  // paper
+  getPaperTemplates: () => invoke("getPaperTemplates"),
+  createPaperTemplate: (payload) => invoke("createPaperTemplate", payload),
+  editPaperTemplate: (templateId, payload) =>
+    invoke("editPaperTemplate", templateId, payload),
+  deletePaperTemplate: (templateId) =>
+    invoke("deletePaperTemplate", templateId),
+  insertDraftPaperItem: (payload) => invoke("insertDraftPaper", payload),
+  editDraftPaperItem: (paperItemId, payload) =>
+    invoke("editDraftPaper", paperItemId, payload),
+  getDraftPaperItems: () => invoke("getDraftPaperItems"),
+  deleteDraftPaperItem: (paperItemId) =>
+    invoke("deleteDraftPaper", paperItemId),
+
+  // order
   finalizeOrder: (payload) => invoke("finalizeOrder", payload),
 };
 

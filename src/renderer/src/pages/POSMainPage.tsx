@@ -1,8 +1,9 @@
 import { Checkout } from "@renderer/components/POS/Checkout";
-import { ItemModal } from "@renderer/components/POS/ItemModal";
+import { ItemModal } from "@renderer/components/POS/ItemModal"; // Or PaperItemModal if separate
 import { TemplateGrid } from "@renderer/components/POS/TemplateGrid";
-import { Input } from "@renderer/components/Input";
+import { Input } from "@renderer/components/shared/Input";
 import usePhotosStore from "@renderer/store/photos";
+import usePaperStore from "@renderer/store/paper";
 import useSettingsStore from "@renderer/store/settings";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 type TemplateFormValues = {
   name: string;
+  type: string;
   width: string;
   height: string;
   price: string;
@@ -18,6 +20,7 @@ type TemplateFormValues = {
 
 const emptyTemplate: TemplateFormValues = {
   name: "",
+  type: "عادي",
   width: "",
   height: "",
   price: "",
@@ -27,65 +30,108 @@ const emptyTemplate: TemplateFormValues = {
 type TemplateModalState = {
   open: boolean;
   editingId: number | null;
+  type: "photo" | "paper";
 };
 
 export default function POSMainPage() {
   const user = useSettingsStore((state) => state.user);
   const clearUser = useSettingsStore((state) => state.clearUser);
+
+  // Photo store hooks
   const loadTemplates = usePhotosStore((state) => state.loadTemplates);
   const loadDraftPhotos = usePhotosStore((state) => state.loadDraftPhotos);
   const createTemplate = usePhotosStore((state) => state.createTemplate);
   const editTemplate = usePhotosStore((state) => state.editTemplate);
+
+  // Paper store hooks
+  const loadPaperTemplates = usePaperStore((state) => state.loadPaperTemplates);
+  const loadDraftPaperItems = usePaperStore(
+    (state) => state.loadDraftPaperItems,
+  );
+  const createPaperTemplate = usePaperStore(
+    (state) => state.createPaperTemplate,
+  );
+  const editPaperTemplate = usePaperStore((state) => state.editPaperTemplate);
+
   const navigate = useNavigate();
-  const [itemTemplateId, setItemTemplateId] = useState<number | null>(null);
-  const [editingPhotoId, setEditingPhotoId] = useState<number | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<{
+    id: number;
+    type: "photo" | "paper";
+  } | null>(null);
+
+  const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [templateModal, setTemplateModal] = useState<TemplateModalState>({
     open: false,
     editingId: null,
+    type: "photo",
   });
   const [status, setStatus] = useState("");
   const [isBusy, setIsBusy] = useState(false);
+
   const templateForm = useForm<TemplateFormValues>({
     defaultValues: emptyTemplate,
   });
 
   useEffect(() => {
-    void Promise.all([loadTemplates(), loadDraftPhotos()]).then((results) => {
+    void Promise.all([
+      loadTemplates(),
+      loadDraftPhotos(),
+      loadPaperTemplates(),
+      loadDraftPaperItems(),
+    ]).then((results) => {
       const failed = results.find((result) => !result.success);
       if (failed && !failed.success) setStatus(failed.error);
     });
-  }, [loadTemplates, loadDraftPhotos]);
+  }, [loadTemplates, loadDraftPhotos, loadPaperTemplates, loadDraftPaperItems]);
 
   const closeItemModal = useCallback(() => {
-    setItemTemplateId(null);
-    setEditingPhotoId(null);
+    setSelectedTemplate(null);
+    setEditingItemId(null);
   }, []);
 
-  const openItemModal = useCallback((templateId: number | undefined) => {
-    if (templateId === undefined) return;
-    setEditingPhotoId(null);
-    setItemTemplateId(templateId);
-  }, []);
+  const openItemModal = useCallback(
+    (templateId: number, type: "photo" | "paper") => {
+      setEditingItemId(null);
+      setSelectedTemplate({ id: templateId, type });
+    },
+    [],
+  );
 
   const openTemplateModal = useCallback(() => {
     templateForm.reset(emptyTemplate);
-    setTemplateModal({ open: true, editingId: null });
+    setTemplateModal({ open: true, editingId: null, type: "photo" });
   }, [templateForm]);
 
   const openTemplateEdit = useCallback(
-    (templateId: number) => {
-      const template = usePhotosStore
-        .getState()
-        .templates.find((item) => item.id === templateId);
-      if (!template) return;
-      templateForm.reset({
-        name: template.name,
-        width: String(template.width),
-        height: String(template.height),
-        price: String(template.price),
-        cost: String(template.cost),
-      });
-      setTemplateModal({ open: true, editingId: templateId });
+    (templateId: number, type: "photo" | "paper") => {
+      if (type === "photo") {
+        const template = usePhotosStore
+          .getState()
+          .templates.find((item) => item.id === templateId);
+        if (!template) return;
+        templateForm.reset({
+          name: template.name,
+          type: "صورة",
+          width: String(template.width),
+          height: String(template.height),
+          price: String(template.price),
+          cost: String(template.cost),
+        });
+      } else {
+        const template = usePaperStore
+          .getState()
+          .paperTemplates.find((item) => item.id === templateId);
+        if (!template) return;
+        templateForm.reset({
+          name: template.name,
+          type: template.type || "عادي",
+          width: String(template.width),
+          height: String(template.height),
+          price: String(template.price),
+          cost: String(template.cost),
+        });
+      }
+      setTemplateModal({ open: true, editingId: templateId, type });
     },
     [templateForm],
   );
@@ -95,34 +141,78 @@ export default function POSMainPage() {
       .getState()
       .draftPhotos.find((item) => item.id === photoId);
     if (!photo) return;
-    setItemTemplateId(photo.templateId);
-    setEditingPhotoId(photoId);
+    setSelectedTemplate({ id: photo.templateId, type: "photo" });
+    setEditingItemId(photoId);
   }, []);
 
+  const openPaperEdit = useCallback((paperId: number) => {
+    const paper = usePaperStore
+      .getState()
+      .draftPaperItems.find((item) => item.id === paperId);
+    if (!paper) return;
+    setSelectedTemplate({ id: paper.paperTemplateId, type: "paper" });
+    setEditingItemId(paperId);
+  }, []);
+
+  const handleEditItem = useCallback(
+    (id: number, type: "photo" | "paper") => {
+      if (type === "photo") {
+        openPhotoEdit(id);
+      } else {
+        openPaperEdit(id);
+      }
+    },
+    [openPhotoEdit, openPaperEdit],
+  );
+
   const closeTemplateModal = useCallback(() => {
-    setTemplateModal({ open: false, editingId: null });
+    setTemplateModal({ open: false, editingId: null, type: "photo" });
     templateForm.reset(emptyTemplate);
   }, [templateForm]);
 
   const handleTemplateSubmit = async (values: TemplateFormValues) => {
     setIsBusy(true);
-    const input = {
-      name: values.name.trim(),
-      width: Number(values.width),
-      height: Number(values.height),
-      unit: "cm",
-      price: Number(values.price),
-      cost: Number(values.cost),
-    };
-    const result =
-      templateModal.editingId === null
-        ? await createTemplate(input)
-        : await editTemplate(templateModal.editingId, input);
-    setIsBusy(false);
-    if (!result.success) {
-      setStatus(result.error);
-      return;
+
+    if (templateModal.type === "photo") {
+      const input = {
+        name: values.name.trim(),
+        width: Number(values.width),
+        height: Number(values.height),
+        unit: "cm",
+        price: Number(values.price),
+        cost: Number(values.cost),
+      };
+      const result =
+        templateModal.editingId === null
+          ? await createTemplate(input)
+          : await editTemplate(templateModal.editingId, input);
+
+      setIsBusy(false);
+      if (!result.success) {
+        setStatus(result.error);
+        return;
+      }
+    } else {
+      const input = {
+        name: values.name.trim(),
+        type: values.type.trim() || "عادي",
+        width: Number(values.width),
+        height: Number(values.height),
+        price: Number(values.price),
+        cost: Number(values.cost),
+      };
+      const result =
+        templateModal.editingId === null
+          ? await createPaperTemplate(input)
+          : await editPaperTemplate(templateModal.editingId, input);
+
+      setIsBusy(false);
+      if (!result.success) {
+        setStatus(result.error);
+        return;
+      }
     }
+
     closeTemplateModal();
     setStatus(
       templateModal.editingId === null
@@ -165,12 +255,13 @@ export default function POSMainPage() {
 
       <div className="grid min-h-0 flex-1 w-full gap-4 overflow-y-auto md:grid-cols-12 md:items-start lg:gap-8">
         <TemplateGrid
-          selectedTemplateId={itemTemplateId}
+          selectedTemplateId={selectedTemplate?.id ?? null}
+          selectedType={selectedTemplate?.type ?? null}
           onSelect={openItemModal}
           onCreate={openTemplateModal}
           onEdit={openTemplateEdit}
         />
-        <Checkout isBusy={isBusy} onEditPhoto={openPhotoEdit} />
+        <Checkout isBusy={isBusy} onEditItem={handleEditItem} />
         {status && (
           <p
             role="status"
@@ -181,11 +272,15 @@ export default function POSMainPage() {
         )}
       </div>
 
-      <ItemModal
-        templateId={itemTemplateId}
-        photoId={editingPhotoId}
-        onClose={closeItemModal}
-      />
+      {/* Item Modal: Pass both templateId AND type (or conditional render if you have PaperModal vs ItemModal) */}
+      {selectedTemplate && (
+        <ItemModal
+          templateId={selectedTemplate.id}
+          type={selectedTemplate.type}
+          editingItemId={editingItemId}
+          onClose={closeItemModal}
+        />
+      )}
 
       {templateModal.open && (
         <div
@@ -202,7 +297,9 @@ export default function POSMainPage() {
           >
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-accent">قالب صورة</p>
+                <p className="text-sm font-semibold text-accent">
+                  {templateModal.type === "photo" ? "قالب صورة" : "قالب ورق"}
+                </p>
                 <h2 className="mt-1 text-2xl font-bold">
                   {templateModal.editingId === null
                     ? "إضافة قالب جديد"
@@ -217,6 +314,38 @@ export default function POSMainPage() {
                 ×
               </button>
             </div>
+
+            {templateModal.editingId === null && (
+              <div className="mb-4 grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setTemplateModal((prev) => ({ ...prev, type: "photo" }))
+                  }
+                  className={`rounded-lg py-2 text-sm font-bold transition ${
+                    templateModal.type === "photo"
+                      ? "bg-white text-primary shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  صورة
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setTemplateModal((prev) => ({ ...prev, type: "paper" }))
+                  }
+                  className={`rounded-lg py-2 text-sm font-bold transition ${
+                    templateModal.type === "paper"
+                      ? "bg-white text-primary shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  ورق
+                </button>
+              </div>
+            )}
+
             <form
               onSubmit={templateForm.handleSubmit(handleTemplateSubmit)}
               className="space-y-4"
@@ -230,9 +359,22 @@ export default function POSMainPage() {
                   })}
                 />
               </Input.Root>
+
+              {templateModal.type === "paper" && (
+                <Input.Root>
+                  <Input.Label>نوع الورق</Input.Label>
+                  <Input.Control
+                    required
+                    registration={templateForm.register("type", {
+                      required: true,
+                    })}
+                  />
+                </Input.Root>
+              )}
+
               <div className="grid grid-cols-2 gap-3">
                 <Input.Root>
-                  <Input.Label>العرض</Input.Label>
+                  <Input.Label>العرض (سم)</Input.Label>
                   <Input.Control
                     required
                     min="1"
@@ -243,7 +385,7 @@ export default function POSMainPage() {
                   />
                 </Input.Root>
                 <Input.Root>
-                  <Input.Label>الارتفاع</Input.Label>
+                  <Input.Label>الارتفاع (سم)</Input.Label>
                   <Input.Control
                     required
                     min="1"
@@ -254,6 +396,7 @@ export default function POSMainPage() {
                   />
                 </Input.Root>
               </div>
+
               <Input.Root>
                 <Input.Label>السعر للعميل</Input.Label>
                 <Input.Control
@@ -266,6 +409,7 @@ export default function POSMainPage() {
                   })}
                 />
               </Input.Root>
+
               <Input.Root>
                 <Input.Label>التكلفة</Input.Label>
                 <Input.Control

@@ -1,5 +1,6 @@
 import { ElectronAPI } from "@electron-toolkit/preload";
 import { PhotoTemplate } from "@shared/types/PhotoTemplate";
+import { PaperTemplate } from "@shared/types/PaperTemplate";
 import { EventPayloadMapping } from "@shared/types/EventPayloadMapping";
 
 type unsubscribe = () => void;
@@ -57,6 +58,40 @@ declare global {
       deleteDraftPhoto: (
         photoId: number,
       ) => Promise<EventPayloadMapping["deleteDraftPhoto"]>;
+
+      // paper
+      getPaperTemplates: () => Promise<
+        EventPayloadMapping["getPaperTemplates"]
+      >;
+      createPaperTemplate: (
+        payload: Omit<PaperTemplate, "id">,
+      ) => Promise<EventPayloadMapping["createPaperTemplate"]>;
+      editPaperTemplate: (
+        templateId: number,
+        payload: Omit<PaperTemplate, "id">,
+      ) => Promise<EventPayloadMapping["editPaperTemplate"]>;
+      deletePaperTemplate: (
+        templateId: number,
+      ) => Promise<EventPayloadMapping["deletePaperTemplate"]>;
+      insertDraftPaperItem: (payload: {
+        paperTemplateId: number;
+        qty: number;
+      }) => Promise<EventPayloadMapping["insertDraftPaperItem"]>;
+      editDraftPaperItem: (
+        paperItemId: number,
+        payload: {
+          paperTemplateId: number;
+          qty: number;
+        },
+      ) => Promise<EventPayloadMapping["editDraftPaperItem"]>;
+      getDraftPaperItems: () => Promise<
+        EventPayloadMapping["getDraftPaperItems"]
+      >;
+      deleteDraftPaperItem: (
+        paperItemId: number,
+      ) => Promise<EventPayloadMapping["deleteDraftPaperItem"]>;
+
+      // orders
       finalizeOrder: ({
         customerPaid,
       }: {

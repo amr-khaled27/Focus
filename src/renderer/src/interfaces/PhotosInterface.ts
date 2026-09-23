@@ -37,5 +37,5 @@ export default interface PhotosState {
     customerPaid,
   }: {
     customerPaid: number;
-  }) => Promise<Result<{ id: number; itemCount: number; total: number }>>;
+  }) => Promise<Result<{ itemCount: number; total: number }>>;
 }

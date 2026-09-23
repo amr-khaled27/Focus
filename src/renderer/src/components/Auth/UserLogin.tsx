@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import useSettingsStore from "@renderer/store/settings";
 import { User } from "@shared/types/User";
-import { Input } from "@renderer/components/Input";
+import { Input } from "@renderer/components/shared/Input";
 import { PasswordVisibilityToggle } from "./PasswordVisibilityToggle";
 import { UserCog2, User2 } from "lucide-react";
 

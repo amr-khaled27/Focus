@@ -1,6 +1,8 @@
 import { User } from "./User";
 import { PhotoTemplate } from "./PhotoTemplate";
 import { Photo } from "./Photo";
+import { PaperTemplate } from "./PaperTemplate";
+import { PaperItem } from "./PaperItem";
 
 export type EventPayloadMapping = {
   // auth routes
@@ -33,25 +35,49 @@ export type EventPayloadMapping = {
     | { success: true; templates: PhotoTemplate[] }
     | { success: false; error: string };
   createPhotoTemplate:
-    | { success: true; template: Omit<PhotoTemplate, "id"> }
+    | { success: true; template: PhotoTemplate }
     | { success: false; error: string };
   editTemplate:
     | { success: true; template: PhotoTemplate }
     | { success: false; error: string };
   insertDraftPhoto:
-    | { success: true; photo: Omit<Photo, "id"> }
+    | { success: true; photo: Photo }
     | { success: false; error: string };
   editDraftPhoto:
-    | { success: true; photo: Omit<Photo, "id"> }
+    | { success: true; photo: Photo }
     | { success: false; error: string };
   getDraftPhotos:
-    | { success: true; photos: Omit<Photo, "id">[] }
+    | { success: true; photos: Photo[] }
     | { success: false; error: string };
   deleteDraftPhoto: { success: true } | { success: false; error: string };
+
+  // paper routes
+  getPaperTemplates:
+    | { success: true; templates: PaperTemplate[] }
+    | { success: false; error: string };
+  createPaperTemplate:
+    | { success: true; template: PaperTemplate }
+    | { success: false; error: string };
+  editPaperTemplate:
+    | { success: true; template: PaperTemplate }
+    | { success: false; error: string };
+  deletePaperTemplate: { success: true } | { success: false; error: string };
+  insertDraftPaper:
+    | { success: true; paperItem: PaperItem }
+    | { success: false; error: string };
+  editDraftPaper:
+    | { success: true; paperItem: PaperItem }
+    | { success: false; error: string };
+  getDraftPaperItems:
+    | { success: true; paperItems: PaperItem[] }
+    | { success: false; error: string };
+  deleteDraftPaper: { success: true } | { success: false; error: string };
+
+  // order routes
   finalizeOrder:
     | {
         success: true;
-        order: { orderId: number; itemCount: number; total: number };
+        order: { id: number; itemCount: number; total: number };
       }
     | { success: false; error: string };
 };
