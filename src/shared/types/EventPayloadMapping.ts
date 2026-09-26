@@ -1,13 +1,9 @@
 import { User } from "./User";
-import { PhotoTemplate } from "./PhotoTemplate";
+import { PhotoTemplateWithStock } from "./PhotoTemplate";
 import { Photo } from "./Photo";
-import { PaperTemplate } from "./PaperTemplate";
+import { PaperTemplateWithStock } from "./PaperTemplate";
 import { PaperItem } from "./PaperItem";
-import {
-  Stock,
-  TemplateRecipe,
-  RecipeWithStock,
-} from "@main/db/services/inventory";
+import { Stock, TemplateRecipe, RecipeWithStock } from "./Inventory";
 
 export type EventPayloadMapping = {
   // auth routes
@@ -37,13 +33,13 @@ export type EventPayloadMapping = {
 
   // photo routes
   getPhotoTemplates:
-    | { success: true; templates: PhotoTemplate[] }
+    | { success: true; templates: PhotoTemplateWithStock[] }
     | { success: false; error: string };
   createPhotoTemplate:
-    | { success: true; template: PhotoTemplate }
+    | { success: true; template: PhotoTemplateWithStock }
     | { success: false; error: string };
   editTemplate:
-    | { success: true; template: PhotoTemplate }
+    | { success: true; template: PhotoTemplateWithStock }
     | { success: false; error: string };
   insertDraftPhoto:
     | { success: true; photo: Photo }
@@ -58,13 +54,13 @@ export type EventPayloadMapping = {
 
   // paper routes
   getPaperTemplates:
-    | { success: true; templates: PaperTemplate[] }
+    | { success: true; templates: PaperTemplateWithStock[] }
     | { success: false; error: string };
   createPaperTemplate:
-    | { success: true; template: PaperTemplate }
+    | { success: true; template: PaperTemplateWithStock }
     | { success: false; error: string };
   editPaperTemplate:
-    | { success: true; template: PaperTemplate }
+    | { success: true; template: PaperTemplateWithStock }
     | { success: false; error: string };
   deletePaperTemplate: { success: true } | { success: false; error: string };
   insertDraftPaper:

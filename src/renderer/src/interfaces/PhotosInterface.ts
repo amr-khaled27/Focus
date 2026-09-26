@@ -1,21 +1,24 @@
 import { Photo } from "@shared/types/Photo";
-import { PhotoTemplate } from "@shared/types/PhotoTemplate";
+import {
+  PhotoTemplateInput,
+  PhotoTemplateWithStock,
+} from "@shared/types/PhotoTemplate";
 
 type Result<T> =
   | { success: true; value: T }
   | { success: false; error: string };
 
 export default interface PhotosState {
-  templates: PhotoTemplate[];
+  templates: PhotoTemplateWithStock[];
   draftPhotos: Photo[];
-  loadTemplates: () => Promise<Result<PhotoTemplate[]>>;
+  loadTemplates: () => Promise<Result<PhotoTemplateWithStock[]>>;
   createTemplate: (
-    template: Omit<PhotoTemplate, "id">,
-  ) => Promise<Result<PhotoTemplate>>;
+    template: PhotoTemplateInput,
+  ) => Promise<Result<PhotoTemplateWithStock>>;
   editTemplate: (
     templateId: number,
-    template: Omit<PhotoTemplate, "id">,
-  ) => Promise<Result<PhotoTemplate>>;
+    template: PhotoTemplateInput,
+  ) => Promise<Result<PhotoTemplateWithStock>>;
   addDraftPhoto: (input: {
     templateId: number;
     personName?: string;

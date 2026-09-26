@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Modal } from "@renderer/components/shared/Modal";
 import { Input } from "@renderer/components/shared/Input";
 import { TemplateFormValues } from "@renderer/types/types";
+import useStockStore from "@renderer/store/stock";
 
 const emptyTemplate: TemplateFormValues = {
   name: "",
@@ -11,6 +12,8 @@ const emptyTemplate: TemplateFormValues = {
   height: "",
   price: "",
   cost: "",
+  stockId: "",
+  stockQuantityUsed: "1",
 };
 
 type TemplateKind = "photo" | "paper";
@@ -44,6 +47,8 @@ export function TemplateModal({
   onSubmit,
 }: TemplateModalProps) {
   const form = useForm<TemplateFormValues>({ defaultValues: emptyTemplate });
+  const stocks = useStockStore((state) => state.stocks);
+  const selectedStockId = form.watch("stockId");
 
   // Re-seed the form whenever the modal opens or the target template changes.
   useEffect(() => {
@@ -131,6 +136,40 @@ export function TemplateModal({
                 registration={form.register("cost", { required: true })}
               />
             </Input.Root>
+
+            <div className="border-t border-slate-100 pt-4">
+              <Input.Root>
+                <Input.Label>المصدر</Input.Label>
+                <select
+                  {...form.register("stockId")}
+                  className="mt-2 h-12 w-full rounded-xl border border-slate-200 px-4 outline-none duration-100 hover:border-slate-300 focus:ring-1"
+                >
+                  <option value="">تصنيع خارجي (لا يخصم من المخزون)</option>
+                  {stocks.map((stock) => (
+                    <option key={stock.id} value={stock.id}>
+                      {stock.name} ({stock.unit})
+                    </option>
+                  ))}
+                </select>
+              </Input.Root>
+
+              {selectedStockId && (
+                <div className="mt-4">
+                  <Input.Root>
+                    <Input.Label>الكمية المستهلكة لكل وحدة مباعة</Input.Label>
+                    <Input.Control
+                      required
+                      min="0.01"
+                      step="any"
+                      type="number"
+                      registration={form.register("stockQuantityUsed", {
+                        required: true,
+                      })}
+                    />
+                  </Input.Root>
+                </div>
+              )}
+            </div>
 
             <button
               disabled={isBusy}

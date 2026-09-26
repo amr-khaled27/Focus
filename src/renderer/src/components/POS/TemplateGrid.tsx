@@ -63,6 +63,13 @@ export const TemplateGrid = memo(function TemplateGrid({
                 <span className="mt-1 block text-xs text-slate-500">
                   {template.width} × {template.height} سم (صورة)
                 </span>
+                <span
+                  className={`mt-1 block text-[11px] font-semibold ${
+                    template.stockLink ? "text-primary/70" : "text-slate-400"
+                  }`}
+                >
+                  {template.stockLink ? "من المخزون" : "تصنيع خارجي"}
+                </span>
                 <span className="mt-3 block text-sm font-bold text-primary">
                   {money(template.price)}
                 </span>
@@ -109,6 +116,13 @@ export const TemplateGrid = memo(function TemplateGrid({
                 <span className="mt-1 block text-xs text-slate-500">
                   {template.width} × {template.height} سم (
                   {template.type || "ورق"})
+                </span>
+                <span
+                  className={`mt-1 block text-[11px] font-semibold ${
+                    template.stockLink ? "text-primary/70" : "text-slate-400"
+                  }`}
+                >
+                  {template.stockLink ? "من المخزون" : "تصنيع خارجي"}
                 </span>
                 <span className="mt-3 block text-sm font-bold text-primary">
                   {money(template.price)}

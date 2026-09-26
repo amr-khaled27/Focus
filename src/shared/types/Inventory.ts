@@ -44,3 +44,13 @@ export type CreateTemplateRecipeInput = {
 export type UpdateTemplateRecipeInput = Partial<
   Omit<CreateTemplateRecipeInput, "templateType" | "templateId">
 >;
+
+// The stock choice made inside a template's create/edit modal:
+// either "this template draws `quantityUsed` units of this stock item
+// per unit sold" or null, meaning the template is outsourced and never
+// touches inventory. Shared by PhotoTemplate and PaperTemplate so both
+// modals speak the same shape.
+export type StockLink = {
+  stockId: number;
+  quantityUsed: number;
+} | null;

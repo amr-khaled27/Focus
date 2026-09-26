@@ -1,4 +1,7 @@
-import { PaperTemplate } from "@shared/types/PaperTemplate";
+import {
+  PaperTemplateInput,
+  PaperTemplateWithStock,
+} from "@shared/types/PaperTemplate";
 import { PaperItem } from "@shared/types/PaperItem";
 
 export type ApiResponse<T> =
@@ -7,18 +10,18 @@ export type ApiResponse<T> =
 
 export interface PaperState {
   // State
-  paperTemplates: PaperTemplate[];
+  paperTemplates: PaperTemplateWithStock[];
   draftPaperItems: PaperItem[];
 
   // Actions
-  loadPaperTemplates: () => Promise<ApiResponse<PaperTemplate[]>>;
+  loadPaperTemplates: () => Promise<ApiResponse<PaperTemplateWithStock[]>>;
   createPaperTemplate: (
-    template: Omit<PaperTemplate, "id">,
-  ) => Promise<ApiResponse<PaperTemplate>>;
+    template: PaperTemplateInput,
+  ) => Promise<ApiResponse<PaperTemplateWithStock>>;
   editPaperTemplate: (
     templateId: number,
-    template: Omit<PaperTemplate, "id">,
-  ) => Promise<ApiResponse<PaperTemplate>>;
+    template: PaperTemplateInput,
+  ) => Promise<ApiResponse<PaperTemplateWithStock>>;
   deletePaperTemplate: (templateId: number) => Promise<ApiResponse<void>>;
 
   addDraftPaperItem: (input: {

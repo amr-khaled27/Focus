@@ -9,7 +9,7 @@ import {
   insertDraftPhoto,
 } from "@main/db/index";
 import { handle } from "@main/utils/handle";
-import { PhotoTemplate } from "@shared/types/PhotoTemplate";
+import { PhotoTemplateInput } from "@shared/types/PhotoTemplate";
 
 export default function handlePhotoCatalog(
   mainWindow: Electron.BrowserWindow | null,
@@ -32,7 +32,7 @@ export default function handlePhotoCatalog(
     mainWindow,
     "createPhotoTemplate",
     async (event, ...args: unknown[]) => {
-      const payload = args[0] as Omit<PhotoTemplate, "id">;
+      const payload = args[0] as PhotoTemplateInput;
       if (!isTrustedSender(event, mainWindow)) {
         return { success: false, error: "طلب غير موثوق" };
       }
@@ -48,7 +48,7 @@ export default function handlePhotoCatalog(
   );
 
   handle(mainWindow, "editTemplate", async (event, ...args: unknown[]) => {
-    const [templateId, payload] = args as [number, Omit<PhotoTemplate, "id">];
+    const [templateId, payload] = args as [number, PhotoTemplateInput];
     if (!isTrustedSender(event, mainWindow)) {
       return { success: false, error: "طلب غير موثوق" };
     }

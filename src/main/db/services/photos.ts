@@ -1,37 +1,103 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { getDatabase } from "../client";
-import { photoTemplates, photoItems, items } from "../schema";
-import { PhotoTemplate } from "@shared/types/PhotoTemplate";
+import { photoTemplates, photoItems, items, templateRecipes } from "../schema";
+import {
+  PhotoTemplateInput,
+  PhotoTemplateWithStock,
+} from "@shared/types/PhotoTemplate";
 import { Photo } from "@shared/types/Photo";
 
-export async function getPhotoTemplates(): Promise<PhotoTemplate[]> {
-  return getDatabase().select().from(photoTemplates);
+const TEMPLATE_TYPE = "photo";
+
+export async function getPhotoTemplates(): Promise<PhotoTemplateWithStock[]> {
+  // Left join so templates with no recipe row still come back, with
+  // stockLink: null. Assumes at most one recipe row per template, which
+  // is what createPhotoTemplate/editTemplate below now enforce.
+  const rows = await getDatabase()
+    .select({ template: photoTemplates, recipe: templateRecipes })
+    .from(photoTemplates)
+    .leftJoin(
+      templateRecipes,
+      and(
+        eq(templateRecipes.templateId, photoTemplates.id),
+        eq(templateRecipes.templateType, TEMPLATE_TYPE),
+      ),
+    );
+
+  return rows.map((r) => ({
+    ...r.template,
+    stockLink: r.recipe
+      ? { stockId: r.recipe.stockId, quantityUsed: r.recipe.quantityUsed }
+      : null,
+  }));
 }
 
 export async function createPhotoTemplate(
-  template: Omit<PhotoTemplate, "id">,
-): Promise<PhotoTemplate> {
-  const result = await getDatabase()
-    .insert(photoTemplates)
-    .values(template)
-    .returning();
-  return result[0];
+  input: PhotoTemplateInput,
+): Promise<PhotoTemplateWithStock> {
+  const { stockLink, ...templateFields } = input;
+
+  return getDatabase().transaction(async (tx) => {
+    const result = await tx
+      .insert(photoTemplates)
+      .values(templateFields)
+      .returning();
+    const template = result[0];
+
+    if (stockLink) {
+      await tx.insert(templateRecipes).values({
+        stockId: stockLink.stockId,
+        templateType: TEMPLATE_TYPE,
+        templateId: template.id,
+        quantityUsed: stockLink.quantityUsed,
+      });
+    }
+
+    return { ...template, stockLink };
+  });
 }
 
 export async function editTemplate(
   templateId: number,
-  template: Omit<PhotoTemplate, "id">,
-): Promise<PhotoTemplate> {
-  const result = await getDatabase()
-    .update(photoTemplates)
-    .set(template)
-    .where(eq(photoTemplates.id, templateId))
-    .returning();
+  input: PhotoTemplateInput,
+): Promise<PhotoTemplateWithStock> {
+  const { stockLink, ...templateFields } = input;
 
-  if (result.length === 0) {
-    throw new Error("Photo template not found");
-  }
-  return result[0];
+  return getDatabase().transaction(async (tx) => {
+    const result = await tx
+      .update(photoTemplates)
+      .set(templateFields)
+      .where(eq(photoTemplates.id, templateId))
+      .returning();
+
+    if (result.length === 0) {
+      throw new Error("Photo template not found");
+    }
+    const template = result[0];
+
+    // Replace whatever recipe link existed before with the modal's
+    // current choice. Covers "kept the same link", "changed stock or
+    // qty", and "switched to outsourced" with one code path.
+    await tx
+      .delete(templateRecipes)
+      .where(
+        and(
+          eq(templateRecipes.templateType, TEMPLATE_TYPE),
+          eq(templateRecipes.templateId, templateId),
+        ),
+      );
+
+    if (stockLink) {
+      await tx.insert(templateRecipes).values({
+        stockId: stockLink.stockId,
+        templateType: TEMPLATE_TYPE,
+        templateId,
+        quantityUsed: stockLink.quantityUsed,
+      });
+    }
+
+    return { ...template, stockLink };
+  });
 }
 
 export async function insertDraftPhoto(input: {

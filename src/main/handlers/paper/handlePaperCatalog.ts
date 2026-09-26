@@ -10,6 +10,7 @@ import {
   insertDraftPaper,
 } from "@main/db/index";
 import { handle } from "@main/utils/handle";
+import { PaperTemplateInput } from "@shared/types/PaperTemplate";
 
 export default function handlePaperCatalog(
   mainWindow: Electron.BrowserWindow | null,
@@ -36,14 +37,7 @@ export default function handlePaperCatalog(
     mainWindow,
     "createPaperTemplate",
     async (event, ...args: unknown[]) => {
-      const payload = args[0] as {
-        name: string;
-        type: string;
-        width: number;
-        height: number;
-        cost: number;
-        price: number;
-      };
+      const payload = args[0] as PaperTemplateInput;
 
       if (!isTrustedSender(event, mainWindow)) {
         return { success: false, error: "طلب غير موثوق" };
@@ -64,17 +58,7 @@ export default function handlePaperCatalog(
   );
 
   handle(mainWindow, "editPaperTemplate", async (event, ...args: unknown[]) => {
-    const [templateId, payload] = args as [
-      number,
-      {
-        name: string;
-        type: string;
-        width: number;
-        height: number;
-        cost: number;
-        price: number;
-      },
-    ];
+    const [templateId, payload] = args as [number, PaperTemplateInput];
 
     if (!isTrustedSender(event, mainWindow)) {
       return { success: false, error: "طلب غير موثوق" };

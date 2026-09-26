@@ -70,6 +70,10 @@ export default function POSMainPage() {
           height: String(template.height),
           price: String(template.price),
           cost: String(template.cost),
+          stockId: template.stockLink ? String(template.stockLink.stockId) : "",
+          stockQuantityUsed: template.stockLink
+            ? String(template.stockLink.quantityUsed)
+            : "1",
         });
       } else {
         const template = usePaperStore
@@ -83,6 +87,10 @@ export default function POSMainPage() {
           height: String(template.height),
           price: String(template.price),
           cost: String(template.cost),
+          stockId: template.stockLink ? String(template.stockLink.stockId) : "",
+          stockQuantityUsed: template.stockLink
+            ? String(template.stockLink.quantityUsed)
+            : "1",
         });
       }
       setTemplateModal({ open: true, editingId: templateId, type });

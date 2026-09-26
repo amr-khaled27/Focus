@@ -1,4 +1,4 @@
-import { isNull, eq } from "drizzle-orm";
+import { isNull, eq, and, inArray } from "drizzle-orm";
 import { getDatabase } from "../client";
 import {
   photoItems,
@@ -7,7 +7,15 @@ import {
   orders,
   payments,
   sessions,
+  templateRecipes,
+  stocks,
 } from "../schema";
+
+type DraftLine = {
+  templateType: "photo" | "paper";
+  templateId: number;
+  qty: number;
+};
 
 export async function finalizeDraftOrder(payload: {
   customerPaid: number;
@@ -49,6 +57,116 @@ export async function finalizeDraftOrder(payload: {
     const total = photosTotal + papersTotal;
 
     const status = payload.customerPaid >= total ? "paid" : "pending";
+
+    // ------------------------------------------------------------
+    // Stock consumption
+    // ------------------------------------------------------------
+    // Build the flat list of "what template, how many units" this
+    // order is about to sell. Templates with no linked recipe rows
+    // just won't show up in `neededByStock` below, which is the
+    // whole mechanism for "some templates consume stock, some don't".
+    const draftLines: DraftLine[] = [
+      ...draftPhotos.map((p) => ({
+        templateType: "photo" as const,
+        templateId: p.photo.templateId,
+        qty: p.photo.qty,
+      })),
+      ...draftPapers.map((p) => ({
+        templateType: "paper" as const,
+        templateId: p.paperItem.paperTemplateId,
+        qty: p.paperItem.qty,
+      })),
+    ];
+
+    if (draftLines.length > 0) {
+      // Pull every recipe row relevant to the templates in this order.
+      // (templateRecipes has no composite index to filter on cheaply,
+      // so we grab by templateType and filter templateId in JS.)
+      const photoTemplateIds = draftLines
+        .filter((l) => l.templateType === "photo")
+        .map((l) => l.templateId);
+      const paperTemplateIds = draftLines
+        .filter((l) => l.templateType === "paper")
+        .map((l) => l.templateId);
+
+      const recipeRows = await transaction
+        .select()
+        .from(templateRecipes)
+        .where(
+          and(
+            eq(templateRecipes.templateType, "photo"),
+            photoTemplateIds.length > 0
+              ? inArray(templateRecipes.templateId, photoTemplateIds)
+              : eq(templateRecipes.templateId, -1), // no-op, matches nothing
+          ),
+        );
+
+      const paperRecipeRows =
+        paperTemplateIds.length > 0
+          ? await transaction
+              .select()
+              .from(templateRecipes)
+              .where(
+                and(
+                  eq(templateRecipes.templateType, "paper"),
+                  inArray(templateRecipes.templateId, paperTemplateIds),
+                ),
+              )
+          : [];
+
+      const allRecipes = [...recipeRows, ...paperRecipeRows];
+
+      // Sum up total consumption per stockId across every draft line,
+      // so a stock item that's used by multiple templates in this
+      // order is checked against its combined demand.
+      const neededByStock = new Map<number, number>();
+      for (const line of draftLines) {
+        const matching = allRecipes.filter(
+          (r) =>
+            r.templateType === line.templateType &&
+            r.templateId === line.templateId,
+        );
+        for (const recipe of matching) {
+          const needed = recipe.quantityUsed * line.qty;
+          neededByStock.set(
+            recipe.stockId,
+            (neededByStock.get(recipe.stockId) || 0) + needed,
+          );
+        }
+      }
+
+      if (neededByStock.size > 0) {
+        const stockIds = Array.from(neededByStock.keys());
+        const stockRows = await transaction
+          .select()
+          .from(stocks)
+          .where(inArray(stocks.id, stockIds));
+
+        const stockById = new Map(stockRows.map((s) => [s.id, s]));
+
+        // Validate first - if anything would go negative, bail out
+        // before writing anything, so the whole order fails cleanly.
+        for (const [stockId, needed] of neededByStock) {
+          const stock = stockById.get(stockId);
+          if (!stock) continue; // linked stock item was deleted; nothing to check
+          if (stock.quantityOnHand < needed) {
+            throw new Error(
+              `Insufficient stock for "${stock.name}": need ${needed} ${stock.unit}, only ${stock.quantityOnHand} available`,
+            );
+          }
+        }
+
+        // All good - deduct.
+        for (const [stockId, needed] of neededByStock) {
+          const stock = stockById.get(stockId);
+          if (!stock) continue;
+          await transaction
+            .update(stocks)
+            .set({ quantityOnHand: stock.quantityOnHand - needed })
+            .where(eq(stocks.id, stockId));
+        }
+      }
+    }
 
     const orderResult = await transaction
       .insert(orders)

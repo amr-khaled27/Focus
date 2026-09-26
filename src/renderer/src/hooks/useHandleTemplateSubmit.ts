@@ -2,6 +2,7 @@ import usePaperStore from "@renderer/store/paper";
 import usePhotosStore from "@renderer/store/photos";
 import { Dispatch, SetStateAction } from "react";
 import { TemplateFormValues, TemplateModalState } from "@renderer/types/types";
+import { StockLink } from "@shared/types/Inventory";
 
 type props = {
   setIsBusy: Dispatch<SetStateAction<boolean>>;
@@ -26,6 +27,14 @@ export default function useTemplateSubmit({
   const handleTemplateSubmit = async (values: TemplateFormValues) => {
     setIsBusy(true);
 
+    // "" in the stock dropdown means outsourced - no recipe row at all.
+    const stockLink: StockLink = values.stockId
+      ? {
+          stockId: Number(values.stockId),
+          quantityUsed: Number(values.stockQuantityUsed) || 1,
+        }
+      : null;
+
     if (templateModal.type === "photo") {
       const input = {
         name: values.name.trim(),
@@ -34,6 +43,7 @@ export default function useTemplateSubmit({
         unit: "cm",
         price: Number(values.price),
         cost: Number(values.cost),
+        stockLink,
       };
       const result =
         templateModal.editingId === null
@@ -53,6 +63,7 @@ export default function useTemplateSubmit({
         height: Number(values.height),
         price: Number(values.price),
         cost: Number(values.cost),
+        stockLink,
       };
       const result =
         templateModal.editingId === null

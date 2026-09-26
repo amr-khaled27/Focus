@@ -1,13 +1,13 @@
 import { ElectronAPI } from "@electron-toolkit/preload";
-import { PhotoTemplate } from "@shared/types/PhotoTemplate";
-import { PaperTemplate } from "@shared/types/PaperTemplate";
+import { PhotoTemplateInput } from "@shared/types/PhotoTemplate";
+import { PaperTemplateInput } from "@shared/types/PaperTemplate";
 import { EventPayloadMapping } from "@shared/types/EventPayloadMapping";
 import {
   CreateStockInput,
   CreateTemplateRecipeInput,
   UpdateStockInput,
   UpdateTemplateRecipeInput,
-} from "@main/db/services/inventory";
+} from "@shared/types/Inventory";
 
 type unsubscribe = () => void;
 
@@ -39,11 +39,11 @@ declare global {
         EventPayloadMapping["getPhotoTemplates"]
       >;
       createPhotoTemplate: (
-        payload: Omit<PhotoTemplate, "id">,
+        payload: PhotoTemplateInput,
       ) => Promise<EventPayloadMapping["createPhotoTemplate"]>;
       editTemplate: (
         templateId: number,
-        payload: Omit<PhotoTemplate, "id">,
+        payload: PhotoTemplateInput,
       ) => Promise<EventPayloadMapping["editTemplate"]>;
       insertDraftPhoto: (payload: {
         templateId: number;
@@ -70,11 +70,11 @@ declare global {
         EventPayloadMapping["getPaperTemplates"]
       >;
       createPaperTemplate: (
-        payload: Omit<PaperTemplate, "id">,
+        payload: PaperTemplateInput,
       ) => Promise<EventPayloadMapping["createPaperTemplate"]>;
       editPaperTemplate: (
         templateId: number,
-        payload: Omit<PaperTemplate, "id">,
+        payload: PaperTemplateInput,
       ) => Promise<EventPayloadMapping["editPaperTemplate"]>;
       deletePaperTemplate: (
         templateId: number,

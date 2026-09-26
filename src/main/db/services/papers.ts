@@ -1,47 +1,108 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { getDatabase } from "../client";
-import { paperTemplates, paperItems, items, sessions } from "../schema";
+import {
+  paperTemplates,
+  paperItems,
+  items,
+  sessions,
+  templateRecipes,
+} from "../schema";
+import {
+  PaperTemplateInput,
+  PaperTemplateWithStock,
+} from "@shared/types/PaperTemplate";
 
-export async function getPaperTemplates() {
-  return getDatabase().select().from(paperTemplates);
+const TEMPLATE_TYPE = "paper";
+
+export async function getPaperTemplates(): Promise<PaperTemplateWithStock[]> {
+  // Left join so templates with no recipe row still come back, with
+  // stockLink: null. Assumes at most one recipe row per template, which
+  // is what createPaperTemplate/editPaperTemplate below now enforce.
+  const rows = await getDatabase()
+    .select({ template: paperTemplates, recipe: templateRecipes })
+    .from(paperTemplates)
+    .leftJoin(
+      templateRecipes,
+      and(
+        eq(templateRecipes.templateId, paperTemplates.id),
+        eq(templateRecipes.templateType, TEMPLATE_TYPE),
+      ),
+    );
+
+  return rows.map((r) => ({
+    ...r.template,
+    stockLink: r.recipe
+      ? { stockId: r.recipe.stockId, quantityUsed: r.recipe.quantityUsed }
+      : null,
+  }));
 }
 
-export async function createPaperTemplate(input: {
-  name: string;
-  type: string;
-  width: number;
-  height: number;
-  cost: number;
-  price: number;
-}) {
-  const result = await getDatabase()
-    .insert(paperTemplates)
-    .values(input)
-    .returning();
-  return result[0];
+export async function createPaperTemplate(
+  input: PaperTemplateInput,
+): Promise<PaperTemplateWithStock> {
+  const { stockLink, ...templateFields } = input;
+
+  return getDatabase().transaction(async (tx) => {
+    const result = await tx
+      .insert(paperTemplates)
+      .values(templateFields)
+      .returning();
+    const template = result[0];
+
+    if (stockLink) {
+      await tx.insert(templateRecipes).values({
+        stockId: stockLink.stockId,
+        templateType: TEMPLATE_TYPE,
+        templateId: template.id,
+        quantityUsed: stockLink.quantityUsed,
+      });
+    }
+
+    return { ...template, stockLink };
+  });
 }
 
 export async function editPaperTemplate(
   templateId: number,
-  input: {
-    name: string;
-    type: string;
-    width: number;
-    height: number;
-    cost: number;
-    price: number;
-  },
-) {
-  const result = await getDatabase()
-    .update(paperTemplates)
-    .set(input)
-    .where(eq(paperTemplates.id, templateId))
-    .returning();
+  input: PaperTemplateInput,
+): Promise<PaperTemplateWithStock> {
+  const { stockLink, ...templateFields } = input;
 
-  if (result.length === 0) {
-    throw new Error("Paper template not found");
-  }
-  return result[0];
+  return getDatabase().transaction(async (tx) => {
+    const result = await tx
+      .update(paperTemplates)
+      .set(templateFields)
+      .where(eq(paperTemplates.id, templateId))
+      .returning();
+
+    if (result.length === 0) {
+      throw new Error("Paper template not found");
+    }
+    const template = result[0];
+
+    // Replace whatever recipe link existed before with the modal's
+    // current choice. Covers "kept the same link", "changed stock or
+    // qty", and "switched to outsourced" with one code path.
+    await tx
+      .delete(templateRecipes)
+      .where(
+        and(
+          eq(templateRecipes.templateType, TEMPLATE_TYPE),
+          eq(templateRecipes.templateId, templateId),
+        ),
+      );
+
+    if (stockLink) {
+      await tx.insert(templateRecipes).values({
+        stockId: stockLink.stockId,
+        templateType: TEMPLATE_TYPE,
+        templateId,
+        quantityUsed: stockLink.quantityUsed,
+      });
+    }
+
+    return { ...template, stockLink };
+  });
 }
 
 export async function deletePaperTemplate(

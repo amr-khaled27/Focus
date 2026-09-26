@@ -109,4 +109,9 @@ const useStockStore = create<StockState>((set) => ({
   },
 }));
 
+// Self-load on module init, same pattern as usePhotosStore / usePaperStore -
+// the TemplateModal's stock dropdown needs `stocks` populated without
+// depending on the Inventory page having been visited first.
+useStockStore.getState().loadStocks();
+
 export default useStockStore;
