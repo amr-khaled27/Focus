@@ -6,13 +6,14 @@ import usePhotosStore from "@renderer/store/photos";
 import usePaperStore from "@renderer/store/paper";
 import useSettingsStore from "@renderer/store/settings";
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { TemplateFormValues, TemplateModalState } from "@renderer/types/types";
 import useTemplateSubmit from "@renderer/hooks/useHandleTemplateSubmit";
 
 export default function POSMainPage() {
+  console.log("main page rerender");
   const user = useSettingsStore((state) => state.user);
-  const clearUser = useSettingsStore((state) => state.clearUser);
+  // const clearUser = useSettingsStore((state) => state.clearUser);
 
   // Photo store hooks
   const loadTemplates = usePhotosStore((state) => state.loadTemplates);
@@ -24,7 +25,7 @@ export default function POSMainPage() {
     (state) => state.loadDraftPaperItems,
   );
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [selectedTemplate, setSelectedTemplate] = useState<{
     id: number;
     type: "photo" | "paper";
@@ -148,11 +149,11 @@ export default function POSMainPage() {
     setTemplateInitialValues(undefined);
   }, []);
 
-  const handleLogout = async () => {
-    await window.api.logout();
-    clearUser();
-    navigate("/", { replace: true });
-  };
+  // const handleLogout = async () => {
+  //   await window.api.logout();
+  //   clearUser();
+  //   navigate("/", { replace: true });
+  // };
 
   if (!user) {
     return (
@@ -164,22 +165,6 @@ export default function POSMainPage() {
 
   return (
     <main className="flex h-screen w-full flex-col overflow-hidden bg-background text-text">
-      <header className="border-b border-slate-200 bg-white px-6 py-4 sm:px-10">
-        <div className="flex w-full items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold text-accent">نقطة البيع</p>
-            <h1 className="text-2xl font-bold">اختر المنتج</h1>
-          </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-600 hover:border-primary hover:text-primary"
-          >
-            تسجيل الخروج
-          </button>
-        </div>
-      </header>
-
       <div className="grid min-h-0 flex-1 w-full gap-4 overflow-y-auto md:grid-cols-12 md:items-start lg:gap-8">
         <TemplateGrid
           selectedTemplateId={selectedTemplate?.id ?? null}

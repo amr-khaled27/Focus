@@ -24,7 +24,7 @@ export const TemplateGrid = memo(function TemplateGrid({
   const paperTemplates = usePaperStore((state) => state.paperTemplates);
 
   return (
-    <section className="min-w-0 pr-4 md:col-span-7">
+    <section className="min-w-0 pr-4 md:col-span-7 pt-4">
       <div className="mb-5 flex items-end justify-between gap-4">
         <div>
           <p className="mb-2 text-sm font-semibold text-accent">القوالب</p>
