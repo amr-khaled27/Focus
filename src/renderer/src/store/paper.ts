@@ -96,4 +96,7 @@ const usePaperStore = create<PaperState>((set) => ({
   },
 }));
 
+usePaperStore.getState().loadPaperTemplates();
+usePaperStore.getState().loadDraftPaperItems();
+
 export default usePaperStore;

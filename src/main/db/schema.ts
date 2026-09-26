@@ -104,3 +104,27 @@ export const payments = sqliteTable("payments", {
   amount: real("amount").notNull(),
   createdAt: text("created_at").notNull(),
 });
+
+// inventory
+
+export const stocks = sqliteTable("stocks", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(), // e.g., "A4 Paper Box", "4x6 Glossy Paper"
+  quantityOnHand: integer("quantity_on_hand").notNull().default(0),
+  reorderLevel: integer("reorder_level").default(10),
+  unit: text("unit").notNull().default(""), // e.g., "roll", "liter", "sheet"
+  costPerUnit: real("cost_per_unit").notNull().default(0),
+});
+
+export const templateRecipes = sqliteTable("template_recipes", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  stockId: integer("stock_id")
+    .notNull()
+    .references(() => stocks.id, { onDelete: "cascade" }),
+
+  // Link to Template ("photo" or "paper")
+  templateType: text("template_type").notNull(),
+  templateId: integer("template_id").notNull(),
+
+  quantityUsed: integer("quantity_used").notNull().default(1),
+});

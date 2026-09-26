@@ -6,6 +6,7 @@ const usePhotosStore = create<PhotosState>((set) => ({
   draftPhotos: [],
 
   loadTemplates: async () => {
+    console.log("fetching!!");
     const response = await window.api.getPhotoTemplates();
     if (!response.success) return response;
     set({ templates: response.templates });
@@ -77,5 +78,8 @@ const usePhotosStore = create<PhotosState>((set) => ({
     };
   },
 }));
+
+usePhotosStore.getState().loadTemplates();
+usePhotosStore.getState().loadDraftPhotos();
 
 export default usePhotosStore;

@@ -5,23 +5,13 @@ import { TemplateModal } from "@renderer/components/POS/TemplateModal";
 import usePhotosStore from "@renderer/store/photos";
 import usePaperStore from "@renderer/store/paper";
 import useSettingsStore from "@renderer/store/settings";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { TemplateFormValues, TemplateModalState } from "@renderer/types/types";
 import useTemplateSubmit from "@renderer/hooks/useHandleTemplateSubmit";
 
 export default function POSMainPage() {
   console.log("main page rerender");
   const user = useSettingsStore((state) => state.user);
-
-  // Photo store hooks
-  const loadTemplates = usePhotosStore((state) => state.loadTemplates);
-  const loadDraftPhotos = usePhotosStore((state) => state.loadDraftPhotos);
-
-  // Paper store hooks
-  const loadPaperTemplates = usePaperStore((state) => state.loadPaperTemplates);
-  const loadDraftPaperItems = usePaperStore(
-    (state) => state.loadDraftPaperItems,
-  );
 
   const [selectedTemplate, setSelectedTemplate] = useState<{
     id: number;
@@ -47,18 +37,6 @@ export default function POSMainPage() {
     setTemplateModal,
     setStatus,
   });
-
-  useEffect(() => {
-    void Promise.all([
-      loadTemplates(),
-      loadDraftPhotos(),
-      loadPaperTemplates(),
-      loadDraftPaperItems(),
-    ]).then((results) => {
-      const failed = results.find((result) => !result.success);
-      if (failed && !failed.success) setStatus(failed.error);
-    });
-  }, [loadTemplates, loadDraftPhotos, loadPaperTemplates, loadDraftPaperItems]);
 
   const closeItemModal = useCallback(() => {
     setSelectedTemplate(null);

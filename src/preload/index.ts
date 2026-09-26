@@ -37,6 +37,24 @@ const api = {
   deleteDraftPaperItem: (paperItemId) =>
     invoke("deleteDraftPaper", paperItemId),
 
+  // inventory
+  getStocks: () => invoke("getStocks"),
+  getStockById: (stockId) => invoke("getStockById", stockId),
+  createStock: (payload) => invoke("createStock", payload),
+  editStock: (stockId, payload) => invoke("editStock", stockId, payload),
+  deleteStock: (stockId) => invoke("deleteStock", stockId),
+  adjustStockQuantity: (stockId, delta) =>
+    invoke("adjustStockQuantity", stockId, delta),
+
+  getRecipesForTemplate: (templateType, templateId) =>
+    invoke("getRecipesForTemplate", templateType, templateId),
+  createTemplateRecipe: (payload) => invoke("createTemplateRecipe", payload),
+  editTemplateRecipe: (recipeId, payload) =>
+    invoke("editTemplateRecipe", recipeId, payload),
+  deleteTemplateRecipe: (recipeId) => invoke("deleteTemplateRecipe", recipeId),
+  deleteRecipesForTemplate: (templateType, templateId) =>
+    invoke("deleteRecipesForTemplate", templateType, templateId),
+
   // order
   finalizeOrder: (payload) => invoke("finalizeOrder", payload),
 };

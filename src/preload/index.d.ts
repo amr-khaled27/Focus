@@ -2,6 +2,12 @@ import { ElectronAPI } from "@electron-toolkit/preload";
 import { PhotoTemplate } from "@shared/types/PhotoTemplate";
 import { PaperTemplate } from "@shared/types/PaperTemplate";
 import { EventPayloadMapping } from "@shared/types/EventPayloadMapping";
+import {
+  CreateStockInput,
+  CreateTemplateRecipeInput,
+  UpdateStockInput,
+  UpdateTemplateRecipeInput,
+} from "@main/db/services/inventory";
 
 type unsubscribe = () => void;
 
@@ -76,20 +82,59 @@ declare global {
       insertDraftPaperItem: (payload: {
         paperTemplateId: number;
         qty: number;
-      }) => Promise<EventPayloadMapping["insertDraftPaperItem"]>;
+      }) => Promise<EventPayloadMapping["insertDraftPaper"]>;
       editDraftPaperItem: (
         paperItemId: number,
         payload: {
           paperTemplateId: number;
           qty: number;
         },
-      ) => Promise<EventPayloadMapping["editDraftPaperItem"]>;
+      ) => Promise<EventPayloadMapping["editDraftPaper"]>;
       getDraftPaperItems: () => Promise<
         EventPayloadMapping["getDraftPaperItems"]
       >;
       deleteDraftPaperItem: (
         paperItemId: number,
-      ) => Promise<EventPayloadMapping["deleteDraftPaperItem"]>;
+      ) => Promise<EventPayloadMapping["deleteDraftPaper"]>;
+
+      // inventory
+      getStocks: () => Promise<EventPayloadMapping["getStocks"]>;
+      getStockById: (
+        stockId: number,
+      ) => Promise<EventPayloadMapping["getStockById"]>;
+      createStock: (
+        payload: CreateStockInput,
+      ) => Promise<EventPayloadMapping["createStock"]>;
+      editStock: (
+        stockId: number,
+        payload: UpdateStockInput,
+      ) => Promise<EventPayloadMapping["editStock"]>;
+      deleteStock: (
+        stockId: number,
+      ) => Promise<EventPayloadMapping["deleteStock"]>;
+      adjustStockQuantity: (
+        stockId: number,
+        delta: number,
+      ) => Promise<EventPayloadMapping["adjustStockQuantity"]>;
+
+      getRecipesForTemplate: (
+        templateType: string,
+        templateId: number,
+      ) => Promise<EventPayloadMapping["getRecipesForTemplate"]>;
+      createTemplateRecipe: (
+        payload: CreateTemplateRecipeInput,
+      ) => Promise<EventPayloadMapping["createTemplateRecipe"]>;
+      editTemplateRecipe: (
+        recipeId: number,
+        payload: UpdateTemplateRecipeInput,
+      ) => Promise<EventPayloadMapping["editTemplateRecipe"]>;
+      deleteTemplateRecipe: (
+        recipeId: number,
+      ) => Promise<EventPayloadMapping["deleteTemplateRecipe"]>;
+      deleteRecipesForTemplate: (
+        templateType: string,
+        templateId: number,
+      ) => Promise<EventPayloadMapping["deleteRecipesForTemplate"]>;
 
       // orders
       finalizeOrder: ({

@@ -83,6 +83,24 @@ CREATE TABLE `sessions` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `sessions_id_unique` ON `sessions` (`id`);--> statement-breakpoint
+CREATE TABLE `stocks` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`name` text NOT NULL,
+	`quantity_on_hand` integer DEFAULT 0 NOT NULL,
+	`reorder_level` integer DEFAULT 10,
+	`unit` text DEFAULT '' NOT NULL,
+	`cost_per_unit` real DEFAULT 0 NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `template_recipes` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`stock_id` integer NOT NULL,
+	`template_type` text NOT NULL,
+	`template_id` integer NOT NULL,
+	`quantity_used` integer DEFAULT 1 NOT NULL,
+	FOREIGN KEY (`stock_id`) REFERENCES `stocks`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `users` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,

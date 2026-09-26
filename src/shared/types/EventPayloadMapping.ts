@@ -3,6 +3,11 @@ import { PhotoTemplate } from "./PhotoTemplate";
 import { Photo } from "./Photo";
 import { PaperTemplate } from "./PaperTemplate";
 import { PaperItem } from "./PaperItem";
+import {
+  Stock,
+  TemplateRecipe,
+  RecipeWithStock,
+} from "@main/db/services/inventory";
 
 export type EventPayloadMapping = {
   // auth routes
@@ -72,6 +77,38 @@ export type EventPayloadMapping = {
     | { success: true; paperItems: PaperItem[] }
     | { success: false; error: string };
   deleteDraftPaper: { success: true } | { success: false; error: string };
+
+  // inventory routes
+  getStocks:
+    | { success: true; stocks: Stock[] }
+    | { success: false; error: string };
+  getStockById:
+    | { success: true; stock: Stock }
+    | { success: false; error: string };
+  createStock:
+    | { success: true; stock: Stock }
+    | { success: false; error: string };
+  editStock:
+    | { success: true; stock: Stock }
+    | { success: false; error: string };
+  deleteStock: { success: true } | { success: false; error: string };
+  adjustStockQuantity:
+    | { success: true; stock: Stock }
+    | { success: false; error: string };
+
+  getRecipesForTemplate:
+    | { success: true; recipes: RecipeWithStock[] }
+    | { success: false; error: string };
+  createTemplateRecipe:
+    | { success: true; recipe: TemplateRecipe }
+    | { success: false; error: string };
+  editTemplateRecipe:
+    | { success: true; recipe: TemplateRecipe }
+    | { success: false; error: string };
+  deleteTemplateRecipe: { success: true } | { success: false; error: string };
+  deleteRecipesForTemplate:
+    | { success: true }
+    | { success: false; error: string };
 
   // order routes
   finalizeOrder:
