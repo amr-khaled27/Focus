@@ -168,81 +168,9 @@ export async function deleteRecipesForTemplate(
   return result.length > 0;
 }
 
-// ==========================================
-// Stock Consumption (call this at checkout time)
-// ==========================================
-
-/**
- * Deducts stock for one finalized order item, based on whatever recipe
- * rows exist for its template. A template with no recipe rows (i.e. one
- * that was never linked to stock) is a no-op here - that's the whole
- * mechanism for "some templates consume stock, some don't".
- *
- * `qty` is however many units of the template were sold in this item
- * (e.g. the photo/paper item's `qty` field).
- *
- * Standalone version, for callers that are NOT already inside a
- * transaction. If you're deducting stock as part of a larger operation
- * (like finalizing an order), use `consumeStockForItemTx` instead so the
- * deduction is atomic with everything else in that operation.
- */
-export async function consumeStockForItem(
-  templateType: string,
-  templateId: number,
-  qty: number,
-): Promise<void> {
-  const recipes = await getRecipesForTemplate(templateType, templateId);
-
-  for (const recipe of recipes) {
-    await adjustStockQuantity(recipe.stockId, -(recipe.quantityUsed * qty));
-  }
-}
-
-// The type of the `tx` callback parameter drizzle passes into
-// `getDatabase().transaction(async (tx) => { ... })`. Deriving it this way
-// keeps it correct regardless of which sqlite driver `getDatabase` wraps.
-type Transaction = Parameters<
-  Parameters<ReturnType<typeof getDatabase>["transaction"]>[0]
->[0];
-
-/**
- * Same deduction as `consumeStockForItem`, but runs against an
- * in-progress transaction (`tx`) instead of a fresh connection, so it
- * commits or rolls back together with whatever else that transaction is
- * doing - e.g. call this once per item inside `finalizeDraftOrder`'s
- * transaction, right alongside creating the order and payment rows.
- */
-export async function consumeStockForItemTx(
-  tx: Transaction,
-  templateType: string,
-  templateId: number,
-  qty: number,
-): Promise<void> {
-  const recipeRows = await tx
-    .select()
-    .from(templateRecipes)
-    .where(
-      and(
-        eq(templateRecipes.templateType, templateType),
-        eq(templateRecipes.templateId, templateId),
-      ),
-    );
-
-  for (const recipe of recipeRows) {
-    const stockRows = await tx
-      .select()
-      .from(stocks)
-      .where(eq(stocks.id, recipe.stockId))
-      .limit(1);
-
-    const stock = stockRows[0];
-    if (!stock) continue; // linked stock item was deleted; nothing to deduct
-
-    await tx
-      .update(stocks)
-      .set({
-        quantityOnHand: stock.quantityOnHand - recipe.quantityUsed * qty,
-      })
-      .where(eq(stocks.id, recipe.stockId));
-  }
-}
+// Stock consumption at checkout time now lives entirely in
+// finalizeDraftOrder (db/services/orders.ts). That function aggregates
+// demand per stock item across every draft line and validates
+// sufficiency before deducting anything, which this module's earlier
+// per-item helpers didn't do - so it's the only stock-deduction path
+// left, rather than two paths that could drift out of sync.
