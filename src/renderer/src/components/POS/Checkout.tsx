@@ -126,7 +126,6 @@ export const Checkout = memo(function Checkout({
         className="flex flex-col justify-between h-full min-h-full"
         onSubmit={checkoutForm.handleSubmit(onFinalizeOrder)}
       >
-        {/* 1. Header (Fixed top) */}
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-white/15 pb-5 shrink-0">
           <div>
             <p className="mb-2 text-sm font-semibold text-white opacity-60">
@@ -144,7 +143,6 @@ export const Checkout = memo(function Checkout({
           </div>
         </div>
 
-        {/* 2. Scrollable Middle Content (Pushes bottom content down) */}
         <div className="flex-1 overflow-y-auto min-h-0 pr-1">
           {isEmpty ? (
             <div className="flex h-full flex-col items-center justify-center py-16 text-center text-white opacity-60">
@@ -160,7 +158,6 @@ export const Checkout = memo(function Checkout({
             </div>
           ) : (
             <div className="space-y-3">
-              {/* Photos Section */}
               {draftPhotos.map((photo) => {
                 const template = photoTemplates.find(
                   (item) => item.id === photo.templateId,
@@ -283,7 +280,6 @@ export const Checkout = memo(function Checkout({
           )}
         </div>
 
-        {/* 3. Footer Section (Pinned to the bottom) */}
         <div className="mt-auto shrink-0 pt-4">
           {totalPrice > 0 && (
             <Input.Root>

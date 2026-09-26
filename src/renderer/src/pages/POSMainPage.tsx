@@ -6,14 +6,12 @@ import usePhotosStore from "@renderer/store/photos";
 import usePaperStore from "@renderer/store/paper";
 import useSettingsStore from "@renderer/store/settings";
 import { useCallback, useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
 import { TemplateFormValues, TemplateModalState } from "@renderer/types/types";
 import useTemplateSubmit from "@renderer/hooks/useHandleTemplateSubmit";
 
 export default function POSMainPage() {
   console.log("main page rerender");
   const user = useSettingsStore((state) => state.user);
-  // const clearUser = useSettingsStore((state) => state.clearUser);
 
   // Photo store hooks
   const loadTemplates = usePhotosStore((state) => state.loadTemplates);
@@ -25,7 +23,6 @@ export default function POSMainPage() {
     (state) => state.loadDraftPaperItems,
   );
 
-  // const navigate = useNavigate();
   const [selectedTemplate, setSelectedTemplate] = useState<{
     id: number;
     type: "photo" | "paper";
@@ -148,12 +145,6 @@ export default function POSMainPage() {
     setTemplateModal({ open: false, editingId: null, type: "photo" });
     setTemplateInitialValues(undefined);
   }, []);
-
-  // const handleLogout = async () => {
-  //   await window.api.logout();
-  //   clearUser();
-  //   navigate("/", { replace: true });
-  // };
 
   if (!user) {
     return (
